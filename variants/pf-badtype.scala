@@ -36,11 +36,13 @@ object PfBadType {
     val d2 = add[Document, "is_beverage" :: HNil](d1)(s => s.at["pnns_groups_1"] == "Beverages")
     val d3 = project[Document, KeepNested](d2)
 
-    // Four steps later, it is used as a number. The domain recorded at
+    // At step 4, it is used as a number. The domain recorded at
     // step 1 has travelled through two operators to meet this one.
     val d4 = add[Document, "dense" :: HNil](d3)(s => s.at["nutriments"].at["carb_share"] > 0.5)
 
-    println(d4.df.count())
+    val d5 = project[Relation, KeepFlat](d4)
+    val d6 = add[Relation, "flag" :: HNil](d5)(s => s.at["dense"] && !s.at["is_beverage"])
+    Sink.typed(d6, Sink.scratch(spark, "PfBadType"))
 
     spark.stop()
   }

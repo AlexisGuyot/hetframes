@@ -32,7 +32,7 @@ object DfBadTransfo {
     val d3 = d2.select(col("code"), col("nutriscore_grade"), col("is_beverage"),
       struct(col("nutriments.carb_share").as("carb_share")).as("nutriments"))
     val d4 = d3.withColumn("dense", col("nutriments.carb_share") > 0.5)
-    val d5 = d4.select("code", "nutriscore_grade", "is_beverage", "dense", "nutriments")
+    val d5 = d4.select("code", "nutriscore_grade", "is_beverage", "nutriments")
     Sink.untyped(d5, Sink.scratch(spark, "DfBadTransfo"))
 
     spark.stop()

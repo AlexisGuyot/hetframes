@@ -33,7 +33,8 @@ object Df2BadTransfo {
       "carb_share", when(energy > 0.0, carbs * 4.0 / energy).otherwise(lit(0.0))))
     val d6 = d5.withColumn("well_rated", col("grade_rank") < 0.5)
 
-    val d7 = d6.select("barcode", "grade_label", "nutriments")
+    val d7 = d6.select(col("barcode"), col("grade_label"),
+      struct(col("nutriments.carb_share").as("carb_share")).as("nutriments"))
     Sink.untyped(d7, Sink.scratch(spark, "Df2BadTransfo"))
 
     spark.stop()

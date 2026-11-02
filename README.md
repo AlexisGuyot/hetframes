@@ -17,7 +17,9 @@ sbt "bench/runMain polyframes.bench.FetchData"
 sbt experiments
 ```
 
-The first extracts the dataset subset; the second compiles every pipeline variant, runs the measured pipelines, and writes `results.csv` and `RESULTS.md`. Expect it to take a few minutes on the reference machine described below.
+The first extracts the dataset subset; the second compiles every pipeline variant, runs the measured pipelines, and writes `results.csv` and `RESULTS.md`, with the number of rounds the article reports (five, after an unmeasured one). Expect it to take a few minutes on the reference machine described below.
+
+The tests of the library are checked by the compiler: `sbt Test/compile` compiles the specifications of `core/src/test`, among which `NegativeSpec` asserts, with `illTyped`, what must not compile. The runtime probes are run by hand, e.g. `sbt "core/Test/runMain polyframes.OpsProbe"`.
 
 ### Setup, once
 

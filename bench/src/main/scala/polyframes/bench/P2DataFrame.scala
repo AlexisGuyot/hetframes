@@ -33,7 +33,7 @@ object P2DataFrame {
     val d3 = d2.withColumnRenamed("code", "barcode")
     val d4 = d3.withColumn("grade_rank", col("grade_rank") / 6.0)
     val d5 = d4.withColumn("nutriments", col("nutriments").withField(
-      "carb_share", when(energy > 0.0, carbs * 4.0 / energy).otherwise(lit(0.0))))
+      "carb_share", when(energy > 0.0, coalesce(carbs, lit(0.0)) * 4.0 / energy).otherwise(lit(0.0))))
     val d6 = d5.withColumn("well_rated", col("grade_rank") < 0.5)
 
     d6.select("barcode", "grade_label", "grade_rank", "well_rated")

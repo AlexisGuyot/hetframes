@@ -22,9 +22,9 @@ object VariantClasses {
 
   case class NotFlatP1(
       code: String, nutriscore_grade: String, is_beverage: Boolean,
-      dense: Boolean, nutriments: P1Dataset.CarbShare)
+      nutriments: P1Dataset.CarbShare)
 
   case class NotFlatP2(
-      barcode: String, grade_label: String, grade_rank: Double,
-      nutriments: P2Dataset.NutrimentsShare)
+      barcode: String, grade_label: String,
+      nutriments: P1Dataset.CarbShare)
 }

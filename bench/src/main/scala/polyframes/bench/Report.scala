@@ -159,10 +159,11 @@ object Report {
     }
 
     sb ++= "\n## Reading these figures\n\n"
-    sb ++= "Compilation is timed in process, on a warm JVM, and the first run of\n"
-    sb ++= "each file is discarded. The figures are therefore lower than what a\n"
-    sb ++= "user waiting on a cold build would see, and are meant for comparing\n"
-    sb ++= "the variants with one another.\n\n"
+    sb ++= "Compilation is timed in process, on a warm JVM: every file is compiled\n"
+    sb ++= "once unmeasured, then in interleaved rounds, and the median of the\n"
+    sb ++= "rounds is kept. The figures are therefore lower than what a user\n"
+    sb ++= "waiting on a cold build would see, and are meant for comparing the\n"
+    sb ++= "variants with one another. Execution follows the same protocol.\n\n"
     sb ++= "Memory is sampled, not computed: a thread reads the used heap every\n"
     sb ++= "50 ms and the highest reading is kept. It sees the whole virtual\n"
     sb ++= "machine, not the pipeline alone.\n"

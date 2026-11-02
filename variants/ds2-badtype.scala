@@ -8,9 +8,24 @@ import polyframes.bench.Sink
 /**
  * Datasets, an attribute of an unexpected domain.
  *
- * Expected: rejected at compile time.
+ * Same injection as pf2-badtype and df2-badtype: grade_rank is updated to
+ * a string at step 4 and read as a number at step 6.
+ *
+ * Expected: rejected at compile time, at step 6.
  */
 object Ds2BadType {
+
+  case class RankedLabel(
+      barcode: String, product_type: String, nutriscore_grade: String,
+      pnns_groups_1: String, completeness: Option[Double],
+      countries_tags: Seq[String], nutriments: Option[NutrimentsNoSalt],
+      grade_code: String, grade_label: String, grade_rank: String)
+
+  case class SharedLabel(
+      barcode: String, product_type: String, nutriscore_grade: String,
+      pnns_groups_1: String, completeness: Option[Double],
+      countries_tags: Seq[String], nutriments: NutrimentsShare,
+      grade_code: String, grade_label: String, grade_rank: String)
 
   def main(args: Array[String]): Unit = {
     val products = args.headOption.getOrElse("data/products-10000.jsonl")
@@ -40,14 +55,15 @@ object Ds2BadType {
       j.pnns_groups_1, j.completeness, j.countries_tags, j.nutriments,
       j.grade_code, j.grade_label, j.grade_rank))
 
-    val d4 = d3.map(j => Ranked(j.barcode, j.product_type, j.nutriscore_grade,
+    // 4. The mistake: the rank is replaced with a label, not a fraction.
+    val d4 = d3.map(j => RankedLabel(j.barcode, j.product_type, j.nutriscore_grade,
       j.pnns_groups_1, j.completeness, j.countries_tags, j.nutriments,
-      j.grade_code, j.grade_label, j.grade_rank.toDouble / 6.0))
+      j.grade_code, j.grade_label, "high"))
 
     val d5 = d4.map { j =>
       val e = j.nutriments.flatMap(_.`energy-kcal_100g`).getOrElse(0.0)
       val c = j.nutriments.flatMap(_.carbohydrates_100g).getOrElse(0.0)
-      Shared(j.barcode, j.product_type, j.nutriscore_grade, j.pnns_groups_1,
+      SharedLabel(j.barcode, j.product_type, j.nutriscore_grade, j.pnns_groups_1,
         j.completeness, j.countries_tags,
         NutrimentsShare(j.nutriments.flatMap(_.`energy-kcal_100g`),
           j.nutriments.flatMap(_.fat_100g), j.nutriments.flatMap(_.carbohydrates_100g),
@@ -55,13 +71,12 @@ object Ds2BadType {
         j.grade_code, j.grade_label, j.grade_rank)
     }
 
+    // 6. Read as a number, across the join and two operators.
     val d6 = d5.map(j => Rated(j.barcode, j.product_type, j.nutriscore_grade,
       j.pnns_groups_1, j.completeness, j.countries_tags, j.nutriments,
       j.grade_code, j.grade_label, j.grade_rank, j.grade_rank < 0.5))
 
-    // grade_label is a String; it cannot be multiplied.
-    val d7 = d6.map(j => Flat(j.barcode, j.grade_label,
-      j.grade_label * 4.0, j.well_rated))
+    val d7 = d6.map(j => Flat(j.barcode, j.grade_label, j.grade_rank, j.well_rated))
     Sink.ofDataset(d7, Sink.scratch(spark, "Ds2BadType"))
 
     spark.stop()

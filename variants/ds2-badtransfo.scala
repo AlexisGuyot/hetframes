@@ -1,7 +1,7 @@
 package polyframes.variants
 
 import org.apache.spark.sql.{Encoders, SparkSession}
-import polyframes.bench.P1Dataset.{Nutriments, Product}
+import polyframes.bench.P1Dataset.{CarbShare, Nutriments, Product}
 import polyframes.bench.P2Dataset._
 import polyframes.bench.Sink
 import polyframes.bench.VariantClasses.NotFlatP2
@@ -63,7 +63,7 @@ object Ds2BadTransfo {
 
     // NotFlatP2 is declared as the flat result of the pipeline, yet keeps
     // a nested attribute. A valid case class is a valid Dataset type.
-    val d7 = d6.map(j => NotFlatP2(j.barcode, j.grade_label, j.grade_rank, j.nutriments))
+    val d7 = d6.map(j => NotFlatP2(j.barcode, j.grade_label, CarbShare(j.nutriments.carb_share)))
     Sink.ofDataset(d7, Sink.scratch(spark, "Ds2BadTransfo"))
 
     spark.stop()

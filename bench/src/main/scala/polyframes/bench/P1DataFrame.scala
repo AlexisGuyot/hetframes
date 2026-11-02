@@ -33,6 +33,10 @@ object P1DataFrame {
     )))
   ))
 
+  // Missing values are read as zero (numbers) or false (the beverage test),
+  // as the decoder of the typed layer and the Options of the Dataset version
+  // do; without the coalesces, Spark would propagate nulls and the three
+  // versions would not compute the same result.
   def apply(spark: SparkSession, path: String): DataFrame = {
     val energy = col("nutriments.`energy-kcal_100g`")
     val carbs  = col("nutriments.`carbohydrates_100g`")
@@ -43,17 +47,17 @@ object P1DataFrame {
       "nutriments",
       col("nutriments").withField(
         "carb_share",
-        when(energy > 0.0, carbs * 4.0 / energy).otherwise(lit(0.0))
+        when(energy > 0.0, coalesce(carbs, lit(0.0)) * 4.0 / energy).otherwise(lit(0.0))
       )
     )
 
-    val d2 = d1.withColumn("is_beverage", col("pnns_groups_1") === "Beverages")
+    val d2 = d1.withColumn("is_beverage", coalesce(col("pnns_groups_1") === "Beverages", lit(false)))
 
     val d3 = d2.select(
       col("code"),
       col("nutriscore_grade"),
       col("is_beverage"),
-      struct(col("nutriments.carb_share").as("carb_share")).as("nutriments")
+      struct(coalesce(col("nutriments.carb_share"), lit(0.0)).as("carb_share")).as("nutriments")
     )
 
     val d4 = d3.withColumn("dense", col("nutriments.carb_share") > 0.5)

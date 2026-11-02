@@ -37,12 +37,15 @@ object DsBadTransfo {
       p.pnns_groups_1, p.completeness, p.countries_tags, p.nutriments,
       p.pnns_groups_1 == "Beverages"))
 
+    val d3 = d2.map(p => Kept(p.code, p.nutriscore_grade, p.is_beverage,
+      CarbShare(p.nutriments.carb_share)))
+    val d4 = d3.map(p => KeptDense(p.code, p.nutriscore_grade, p.is_beverage,
+      p.nutriments, p.nutriments.carb_share > 0.5))
     // NotFlatP1 is declared as the flat result of the pipeline, yet keeps
     // a nested attribute. Being a valid case class, it is a valid Dataset
     // type, and the compiler has nothing to say about it.
-    val d3 = d2.map(p => NotFlatP1(p.code, p.nutriscore_grade, p.is_beverage,
-      p.nutriments.carb_share > 0.5, CarbShare(p.nutriments.carb_share)))
-    Sink.ofDataset(d3, Sink.scratch(spark, "DsBadTransfo"))
+    val d5 = d4.map(p => NotFlatP1(p.code, p.nutriscore_grade, p.is_beverage, p.nutriments))
+    Sink.ofDataset(d5, Sink.scratch(spark, "DsBadTransfo"))
 
     spark.stop()
   }

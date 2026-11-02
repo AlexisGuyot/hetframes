@@ -22,10 +22,17 @@ import java.nio.file.Files
  * first, and alone, because it is the phase whose figures are most
  * sensitive to that.
  */
+/** The number of measured rounds, used when no argument is given, so that
+  * `sbt experiments` reproduces the protocol of the article as is. Odd, so
+  * that the median is one of the measurements. */
+object Protocol {
+  val Rounds: Int = 5
+}
+
 object CompileWidth {
 
   def main(args: Array[String]): Unit = {
-    val runs = args.headOption.map(_.toInt).getOrElse(3)
+    val runs = args.headOption.map(_.toInt).getOrElse(Protocol.Rounds)
     println(s"project root: ${Workspace.root}")
 
     // Preflight. Everything measured from here on leans on the library
@@ -61,16 +68,14 @@ object CompileWidth {
     // axis moved by a factor of three between two runs for that reason
     // alone, before the phases were separated.
     println("\n=== compiling declarations of growing width ===")
+    val timed = Compiler.timedInterleaved(Variants.Widths.map(_._2.source), runs)
     Variants.Widths.foreach { case (width, v) =>
-      if (!Files.exists(v.source)) println(s"${v.name}: missing, skipped")
-      else {
-        val o = Compiler.timed(v.source, runs)
-        println(f"$width%4d attributes  ${o.millis}%7d ms  compiles=${o.compiles}  " +
-          o.firstError.take(60))
-        Results.append(Measurement("width", v.name, "polyframes", "none", "",
-          width.toString, "compile-ms", o.millis.toString,
-          if (o.compiles) "" else o.firstError))
-      }
+      val o = timed(v.source)
+      println(f"$width%4d attributes  ${o.millis}%7d ms  compiles=${o.compiles}  " +
+        o.firstError.take(60))
+      Results.append(Measurement("width", v.name, "polyframes", "none", "",
+        width.toString, "compile-ms", o.millis.toString,
+        if (o.compiles) s"median of $runs interleaved rounds" else o.firstError))
     }
 
     println(s"\nAppended to ${Results.path}")
@@ -80,12 +85,13 @@ object CompileWidth {
 object CompileVariants {
 
   def main(args: Array[String]): Unit = {
-    val runs = args.headOption.map(_.toInt).getOrElse(3)
+    val runs = args.headOption.map(_.toInt).getOrElse(Protocol.Rounds)
     println(s"project root: ${Workspace.root}")
 
     println("\n=== compiling every variant ===")
+    val timed = Compiler.timedInterleaved(Variants.All.map(_.source), runs)
     Variants.All.foreach { v =>
-      val o = Compiler.timed(v.source, runs)
+      val o = timed(v.source)
       val agrees = if (o.compiles == v.expectedToCompile) "" else "   <-- UNEXPECTED"
       println(f"${v.name}%-15s compiles=${o.compiles}%-6s ${o.millis}%6d ms  " +
         o.firstError.take(70) + agrees)
@@ -93,7 +99,7 @@ object CompileVariants {
         Measurement("error-prevention", v.name, v.baseline, v.family, "", "",
           "compiles", o.compiles.toString, o.firstError),
         Measurement("error-prevention", v.name, v.baseline, v.family, "", "",
-          "compile-ms", o.millis.toString, s"median of ${runs - 1} runs")
+          "compile-ms", o.millis.toString, s"median of $runs interleaved rounds")
       ))
     }
 
@@ -104,16 +110,16 @@ object CompileVariants {
 /**
  * Runs what compiles, and measures what the correct pipelines cost.
  *
- * One protocol throughout: every figure is the median of `runs` executions
- * with the first discarded, and every volume point is measured the same
- * way, the smallest one included. There is no separate overhead
+ * One protocol throughout: after an unmeasured round, every figure is the
+ * median of `runs` interleaved rounds, and every volume point is measured
+ * the same way, the smallest one included. There is no separate overhead
  * measurement, because a separate measurement means a differently warmed
  * JVM and figures that cannot be compared with the rest.
  */
 object RunExperiments {
 
   def main(args: Array[String]): Unit = {
-    val runs = args.headOption.map(_.toInt).getOrElse(3)
+    val runs = args.headOption.map(_.toInt).getOrElse(Protocol.Rounds)
     println(s"project root: ${Workspace.root}")
     Workspace.clearOut()
 
@@ -152,19 +158,27 @@ object RunExperiments {
 
     points.foreach { n =>
       val path = Workspace.data(n)
-      Pipelines.Correct.foreach { case (name, baseline, run) =>
-        val outcomes = (1 to runs).map { _ =>
-          Pipelines.withSpark(s"$name-$n")(s => Runner.measure(() => run(s, path)))
+      // One unmeasured round, then `runs` rounds in which each of the six
+      // pipelines runs once, in turn: no pipeline is measured in a JVM
+      // warmer or colder than the others.
+      Pipelines.Correct.foreach { case (name, _, run) =>
+        Pipelines.withSpark(s"$name-$n-warmup")(s => Runner.measure(() => run(s, path)))
+      }
+      val rounds = (1 to runs).map { _ =>
+        Pipelines.Correct.map { case (name, _, run) =>
+          name -> Pipelines.withSpark(s"$name-$n")(s => Runner.measure(() => run(s, path)))
         }
-        val kept = if (outcomes.length > 1) outcomes.tail else outcomes
-        val times = kept.map(_.millis).sorted
-        val heaps = kept.map(_.peakHeapMb).sorted
+      }
+      Pipelines.Correct.foreach { case (name, baseline, _) =>
+        val outcomes = rounds.map(_.collectFirst { case (`name`, o) => o }.get)
+        val times = outcomes.map(_.millis).sorted
+        val heaps = outcomes.map(_.peakHeapMb).sorted
         val failed = outcomes.filterNot(_.runs).map(_.failure).headOption.getOrElse("")
         println(f"$n%8d  $name%-15s ${times(times.length / 2)}%6d ms  " +
           f"${heaps(heaps.length / 2)}%5d MB  $failed")
         Results.appendAll(Seq(
           Measurement("volume", name, baseline, "none", n.toString, "", "run-ms",
-            times(times.length / 2).toString, s"median of ${runs - 1} runs"),
+            times(times.length / 2).toString, s"median of $runs interleaved rounds"),
           Measurement("volume", name, baseline, "none", n.toString, "", "heap-mb",
             heaps(heaps.length / 2).toString, "peak sampled every 50 ms")
         ))

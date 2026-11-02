@@ -35,11 +35,9 @@ object PfBadModel {
       if (e > 0.0) n.at["carbohydrates_100g"] * 4.0 / e else 0.0
     }
     val d2 = add[Document, "is_beverage" :: HNil](d1)(s => s.at["pnns_groups_1"] == "Beverages")
-    val d3 = project[Document, KeepNested](d2)
-    val d4 = add[Document, "dense" :: HNil](d3)(s => s.at["nutriments"].at["carb_share"] > 0.5)
-    // The sink accepts relational data. This data is a document, and says
-    // so in its type.
-    Sink.typed(d4, Sink.scratch(spark, "PfBadModel"))
+    // The sink requires relational data; the document data of step 2 is
+    // handed to it as is.
+    Sink.typed(d2, Sink.scratch(spark, "PfBadModel"))
 
     spark.stop()
   }

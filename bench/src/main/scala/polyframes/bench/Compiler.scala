@@ -97,12 +97,27 @@ object Compiler {
     }
   }
 
-  /** Compiles a file several times and keeps the median, discarding the
-    * first run, which pays for loading the compiler itself. */
-  def timed(source: Path, runs: Int): CompileOutcome = {
-    val outcomes = (1 to runs).map(_ => compile(source))
-    val kept = if (outcomes.length > 1) outcomes.tail else outcomes
-    val times = kept.map(_.millis).sorted
-    outcomes.head.copy(millis = times(times.length / 2))
+  /**
+   * Compiles a set of files in interleaved rounds and keeps, for each file,
+   * the median of its `rounds` timings.
+   *
+   * The JVM running the compiler warms up as it goes: the classes of the
+   * compiler and of the libraries on the classpath are loaded, then
+   * compiled to native code, during the first compilations, whatever file
+   * they compile. Timing the files one after the other, each several times
+   * in a row, therefore charges that warm-up to whichever file comes first,
+   * and the order of the list decides part of the result. Here every file
+   * is first compiled once, unmeasured; then every round compiles every
+   * file once, in the same order, so that each file is measured as often,
+   * and in the same state of the JVM, as the others.
+   */
+  def timedInterleaved(sources: Seq[Path], rounds: Int): Map[Path, CompileOutcome] = {
+    sources.foreach(s => compile(s))                         // warm-up, discarded
+    val measured = (1 to rounds).map(_ => sources.map(s => s -> compile(s)))
+    sources.map { s =>
+      val outcomes = measured.map(_.collectFirst { case (`s`, o) => o }.get)
+      val times = outcomes.map(_.millis).sorted
+      s -> outcomes.head.copy(millis = times(times.length / 2))
+    }.toMap
   }
 }

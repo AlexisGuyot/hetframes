@@ -55,12 +55,16 @@ Injected at the same step of each pipeline, for each of the three baselines, giv
 
 | family | injected as, in P1 | injected as, in P2 |
 |---|---|---|
-| attribute absent | project `cod` | project `grade_labell` |
+| attribute absent | project `cod` at step 3 | project `grade_labell` at step 7 |
 | unexpected domain | `carb_share` created as `String` at step 1, read as a number at step 4 | `grade_rank` updated to `String` at step 4, read as a number at step 6 |
-| unexpected model | the sink is reached with document data | idem, the nesting having survived the join |
-| non-conforming transformation | the last projection keeps a nested attribute yet announces `Relation` | idem |
+| unexpected model | the sink is reached with the document data of step 2 | the sink is reached with the document data of step 6, the nesting having survived the join |
+| non-conforming transformation | the last projection keeps `nutriments.carb_share` yet announces `Relation` | idem, with `barcode`, `grade_label` and `nutriments.carb_share` |
 
-The unexpected-domain variants are deliberately the ones that put distance between the mistake and its symptom: two operators in P1, and in P2 a join, that is, a schema no declaration in the source states.
+Each injection is written identically in the three versions: same attribute, same step, same mistake. In the Dataset versions, the classes describing the intermediate schemas are rewritten to carry the mistaken domain, as a Dataset user would have to.
+
+The unexpected-domain variants are deliberately the ones that put distance between the mistake and its symptom: two operators in between in P1, and in P2 a join, that is, a schema no declaration in the source states.
+
+The three correct versions of each pipeline compute the same result. Missing values are read as zero (numbers) or false (the beverage test) in the three: by the decoder of the typed layer, by the `Option`s of the Dataset version, and by explicit `coalesce`s in the DataFrame version.
 
 ### The width axis
 
@@ -72,11 +76,13 @@ The unexpected-domain variants are deliberately the ones that put distance betwe
 
 The harness embeds the Scala compiler as a library and compiles one source file at a time against the classpath of the JVM running it, which sbt has already populated. Two reasons for not launching sbt once per file: it would measure sbt's own startup and dependency resolution as well as the compilation, and a file that must fail would stop the others.
 
-The price is that the compiler runs on a warm JVM, so the figures are lower than what a user waiting on a cold build sees. They are for comparing programs with one another, not for stating absolute costs. The first compilation of each file is discarded and the median of the rest is kept.
+The price is that the compiler runs on a warm JVM, so the figures are lower than what a user waiting on a cold build sees. They are for comparing programs with one another, not for stating absolute costs.
+
+A JVM warms up as it goes, whatever it compiles: the first files compiled pay for loading and optimising the compiler itself. Timing the files one after the other, several times each, charges that warm-up to whichever comes first, so that the order of the list decides part of the result. Every file is therefore compiled once, unmeasured; then five rounds compile every file once, in the same order; and the median of the five timings of each file is kept. The two compilation phases (the width axis, then the variants) each follow this protocol in a JVM of their own.
 
 ### Execution and memory
 
-Same protocol: five runs, first discarded, median kept. Each run opens its own `SparkSession` in local mode and writes its result, which is what forces the
+Same protocol, at each volume point: one unmeasured round of the six correct pipelines, then five rounds in which each runs once, in turn, and the median of each is kept. Each run opens its own `SparkSession` in local mode and writes its result, which is what forces the
 pipeline to run.
 
 Memory is sampled, not computed. A thread reads `totalMemory - freeMemory` every 50 ms and the highest reading is kept. This is a coarse instrument: it sees the whole JVM rather than the pipeline, and what it reports depends on when the collector happens to run.
