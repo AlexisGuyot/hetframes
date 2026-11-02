@@ -46,7 +46,7 @@ object OpsProbe {
     )
     val d0 = Data[Document, SDoc](docs)
 
-    // 1. Augmentation inside the nested schema (rules 43 and 42).
+    // 1. Augmentation inside the nested schema (rules 38 and 37).
     val d1 = add[Document, "identity" :: "adult" :: HNil](d0)(
       s => s.tail.head.tail.head >= 18
     )

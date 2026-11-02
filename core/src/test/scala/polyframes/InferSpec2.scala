@@ -14,7 +14,7 @@ object InferSpec2 {
   type SIdentity = FieldType["names", List[String]] :: FieldType["age", Int] :: HNil
   type SDoc      = FieldType["id", Int] :: FieldType["identity", SIdentity] :: HNil
 
-  // ---- ProjectOne (rules 35 and 36) -----------------------------------
+  // ---- ProjectOne (rules 30 and 31) -----------------------------------
 
   implicitly[ProjectOne.Aux[SDoc, "id" :: HNil, FieldType["id", Int] :: HNil]]
 
@@ -38,7 +38,7 @@ object InferSpec2 {
     FieldType["identity", SIdentity] :: HNil
   ]]
 
-  // ---- Project over a list of paths (rules 38 and 39) -----------------
+  // ---- Project over a list of paths (rules 33 and 34) -----------------
   // Reduction lays out the attributes of the tail before those of the
   // head, so the projected identity attribute precedes id.
 

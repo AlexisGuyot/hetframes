@@ -1,6 +1,5 @@
 package polyframes.bench
 
-import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 /**

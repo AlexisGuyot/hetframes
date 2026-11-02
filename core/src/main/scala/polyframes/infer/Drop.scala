@@ -63,10 +63,11 @@ object Drop extends LowPriorityDrop {
 
 trait LowPriorityDrop {
   implicit def onNestedList[
-      S <: HList, K, P <: HList, Sub <: HList, NSub <: HList, NS <: HList
+      S <: HList, K, P <: HList, L, Sub <: HList, NSub <: HList, NS <: HList
   ](
       implicit 
-      flat: LookupFlat.Aux[S, K, List[Sub]],
+      flat: LookupFlat.Aux[S, K, L],
+      list: ListOfSchema.Aux[L, Sub],
       inner: Drop.Aux[Sub, P, NSub],
       back: UpdateFlat.Aux[S, K, List[NSub], NS]
   ): Drop.Aux[S, K :: P, NS] =

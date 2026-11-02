@@ -38,16 +38,16 @@ object Ops {
 
   private val udfCounter = new AtomicLong(0L)
 
-  /** Rule 45. */
+  /** Rule 40. */
   def project[MO <: Model, L <: HList]: ProjectOp[MO, L] = new ProjectOp[MO, L]
 
-  /** Rule 46. */
+  /** Rule 41. */
   def add[MO <: Model, P <: HList]: AddOp[MO, P] = new AddOp[MO, P]
 
-  /** Appendix C, by analogy with rule 46. */
+  /** Appendix C, by analogy with rule 41. */
   def update[MO <: Model, P <: HList]: UpdateOp[MO, P] = new UpdateOp[MO, P]
 
-  /** Appendix C, by analogy with rule 45. */
+  /** Appendix C, by analogy with rule 40. */
   def drop[MO <: Model, P <: HList]: DropOp[MO, P] = new DropOp[MO, P]
 
   /** Appendix C. */
@@ -65,7 +65,8 @@ object Ops {
         implicit 
         reduce: Project.Aux[S, L, NS],
         valid: Valid[MO, NS],
-        shape: Shape[NS]
+        shape: Shape[NS],
+        reachable: ObjectPaths[S, L]
     ): Data[MO, NS] = Data[MO, NS](d.df)
   }
 
@@ -74,7 +75,8 @@ object Ops {
         implicit 
         reduce: Drop.Aux[S, P, NS],
         valid: Valid[MO, NS],
-        shape: Shape[NS]
+        shape: Shape[NS],
+        reachable: ObjectPath[S, P]
     ): Data[MO, NS] = Data[MO, NS](d.df)
   }
 
@@ -91,6 +93,7 @@ object Ops {
         reduce: Add.Aux[S, P, T, NS],
         valid: Valid[MO, NS],
         shape: Shape[NS],
+        reachable: ObjectPath[S, P],
         decode: FromRow[S],
         target: Target[P],
         domain: SparkType[T]
@@ -108,6 +111,7 @@ object Ops {
         reduce: Update.Aux[S, P, T, NS],
         valid: Valid[MO, NS],
         shape: Shape[NS],
+        reachable: ObjectPath[S, P],
         decode: FromRow[S],
         target: Target[P],
         domain: SparkType[T]
@@ -122,6 +126,7 @@ object Ops {
         reduce: Rename.Aux[S, P, KNew, NS],
         valid: Valid[MO, NS],
         shape: Shape[NS],
+        reachable: ObjectPath[S, P],
         target: Target[P],
         name: Witness.Aux[KNew]
     ): Data[MO, NS] =
@@ -137,6 +142,11 @@ object Ops {
    * are nested schemas: joining two schemas that share a plain attribute
    * name is rejected at compile time rather than resolved by an arbitrary
    * choice between the two.
+   *
+   * Known limitation: two sources sharing a nested attribute name type-check
+   * (Merge reconciles them into one nested attribute), but the binding to
+   * SparkSQL does not merge the two struct columns, and the result fails at
+   * run time. Attribute names are assumed unique across the two operands.
    */
   final class JoinOp[MO <: Model, PL <: HList, PR <: HList] {
     def apply[
@@ -150,6 +160,8 @@ object Ops {
         merge: Merge.Aux[SL, SR, NS],
         valid: Valid[MO, NS],
         shape: Shape[NS],
+        reachableLeft: ObjectPath[SL, PL],
+        reachableRight: ObjectPath[SR, PR],
         targetLeft: Target[PL],
         targetRight: Target[PR]
     ): Data[MO, NS] =
@@ -171,7 +183,7 @@ object Ops {
    * record, then invoked on a struct of every column of the DataFrame.
    * Since the columns of a DataFrame are always in the order of its schema
    * type, that struct is a term of the schema type, which the decoder
-   * rebuilds. This is what gives `f` the type `S => T` rule 46 demands.
+   * rebuilds. This is what gives `f` the type `S => T` rule 41 demands.
    *
    * The registered function is shipped to the executors, so it closes over
    * two things that have to survive serialisation: `f`, which does because

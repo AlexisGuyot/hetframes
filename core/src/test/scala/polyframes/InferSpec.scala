@@ -28,7 +28,7 @@ object InferSpec {
 
   implicitly[Lookup.Aux[SDoc, "identity" :: "age" :: HNil, Int]]
 
-  // ---- AddFlat (rules 40 and 41) --------------------------------------
+  // ---- AddFlat (rules 35 and 36) --------------------------------------
 
   type SIdentityPlus =
     FieldType["names", List[String]] :: FieldType["age", Int] ::
@@ -36,8 +36,8 @@ object InferSpec {
 
   implicitly[AddFlat.Aux[SIdentity, "adult", Boolean, SIdentityPlus]]
 
-  // ---- Add along a nested path (rules 42 and 43) ----------------------
-  // This is the derivation of Equations 48 and 49 of the article: the
+  // ---- Add along a nested path (rules 37 and 38) ----------------------
+  // This is the derivation of Equations 61 and 62 of the article: the
   // attribute is created inside the nested identity schema, and every
   // other attribute is left where it was.
 
@@ -67,7 +67,7 @@ object InferSpec {
   // No attribute of that name, so LookupFlat runs out of rules:
   //   implicitly[LookupFlat[SDoc, "identty"]]
 
-  // The attribute already exists, so rule 41 has no applicable instance:
+  // The attribute already exists, so rule 36 has no applicable instance:
   //   implicitly[AddFlat[SIdentity, "age", Int]]
 
   // The path cannot be followed: "id" is atomic, not a nested schema:

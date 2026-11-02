@@ -65,7 +65,7 @@ trait LowPriorityMergeOne {
  *
  * The attributes of the second schema are laid out first, then those of the
  * first are inserted one by one with `MergeOne`, so that attributes carried
- * by both are reconciled instead of appearing twice. Rule 39 of the article
+ * by both are reconciled instead of appearing twice. Rule 34 of the article
  * relies on this to project several paths sharing a prefix into a single
  * nested attribute.
  */

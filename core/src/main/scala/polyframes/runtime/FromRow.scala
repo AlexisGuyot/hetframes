@@ -68,7 +68,7 @@ object FromCell {
  * Decoder turning a DataFrame row into a term of the schema type `S`.
  *
  * This is what gives the function passed to the augmentation operator the
- * type `S => T` that rule 46 requires. It has no counterpart in the
+ * type `S => T` that rule 41 requires. It has no counterpart in the
  * article: it belongs to the layer binding the type system to Spark.
  *
  * Decoding is positional. Callers must therefore hand it a row whose

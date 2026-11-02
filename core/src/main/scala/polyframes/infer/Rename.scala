@@ -66,10 +66,11 @@ object Rename extends LowPriorityRename {
 trait LowPriorityRename {
   implicit def onNestedList[
       S <: HList, K, P <: HList, KNew,
-      Sub <: HList, NSub <: HList, NS <: HList
+      L, Sub <: HList, NSub <: HList, NS <: HList
   ](
       implicit 
-      flat: LookupFlat.Aux[S, K, List[Sub]],
+      flat: LookupFlat.Aux[S, K, L],
+      list: ListOfSchema.Aux[L, Sub],
       inner: Rename.Aux[Sub, P, KNew, NSub],
       back: UpdateFlat.Aux[S, K, List[NSub], NS]
   ): Rename.Aux[S, K :: P, KNew, NS] =

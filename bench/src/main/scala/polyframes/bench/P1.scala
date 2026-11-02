@@ -15,9 +15,9 @@ import shapeless.{::, HNil}
  * the article defines. Six steps, each exercising a different part of the
  * type system:
  *
- *   1. augmentation inside a nested schema      rules 43 then 42
- *   2. augmentation at the root                 rule 42
- *   3. projection keeping the nesting           rules 39, 36 and 35
+ *   1. augmentation inside a nested schema      rules 38 then 37
+ *   2. augmentation at the root                 rule 37
+ *   3. projection keeping the nesting           rules 34, 31 and 30
  *   4. augmentation reading the attribute just created inside the nesting
  *   5. projection of atomic attributes only, announced as relational
  *   6. augmentation of the now relational data

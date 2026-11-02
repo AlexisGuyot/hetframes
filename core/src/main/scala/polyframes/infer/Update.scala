@@ -82,10 +82,11 @@ trait LowPriorityUpdate {
   /** Longer path, head key leading to a collection of nested schemas. */
   implicit def onNestedList[
       S <: HList, K, P <: HList, TNew,
-      Sub <: HList, NSub <: HList, NS <: HList
+      L, Sub <: HList, NSub <: HList, NS <: HList
   ](
       implicit 
-      flat: LookupFlat.Aux[S, K, List[Sub]],
+      flat: LookupFlat.Aux[S, K, L],
+      list: ListOfSchema.Aux[L, Sub],
       inner: Update.Aux[Sub, P, TNew, NSub],
       back: UpdateFlat.Aux[S, K, List[NSub], NS]
   ): Update.Aux[S, K :: P, TNew, NS] =

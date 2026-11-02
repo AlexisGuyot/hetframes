@@ -75,9 +75,10 @@ object Lookup extends LowPriorityLookup {
 trait LowPriorityLookup {
 
   /** Longer path, head key leading to a collection of nested schemas. */
-  implicit def onNestedList[S <: HList, K, P <: HList, Sub <: HList, T](
+  implicit def onNestedList[S <: HList, K, P <: HList, L, Sub <: HList, T](
       implicit 
-      flat: LookupFlat.Aux[S, K, List[Sub]],
+      flat: LookupFlat.Aux[S, K, L],
+      list: ListOfSchema.Aux[L, Sub],
       next: Lookup.Aux[Sub, P, T]
   ): Lookup.Aux[S, K :: P, T] =
     new Lookup[S, K :: P] { type Out = T }

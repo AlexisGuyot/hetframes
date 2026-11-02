@@ -67,7 +67,7 @@ object SparkProbe {
 
     // 4. A UDF taking the whole record, registered through the Java
     //    interface and invoked by name. This is what gives the function of
-    //    rule 46 the type S => T, without any legacy setting.
+    //    rule 41 the type S => T, without any legacy setting.
     val decode = implicitly[FromRow[SDoc]]
     val fn: SDoc => Boolean = s => s.tail.head.tail.head >= 18
     spark.udf.register(
