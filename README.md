@@ -19,7 +19,7 @@ sbt experiments
 
 The first extracts the dataset subset; the second compiles every pipeline variant, runs the measured pipelines, and writes `results.csv` and `RESULTS.md`, with the number of rounds the article reports (five, after an unmeasured one). Expect it to take a few minutes on the reference machine described below.
 
-The tests of the library are checked by the compiler: `sbt Test/compile` compiles the specifications of `core/src/test`, among which `NegativeSpec` asserts, with `illTyped`, what must not compile. The runtime probes are run by hand, e.g. `sbt "core/Test/runMain polyframes.OpsProbe"`.
+The tests of the library are in `core/src/test`. Two are checked by the compiler alone, so `sbt Test/compile` runs them: `TypeSpec` (what must compile, with the expected schemas) and `NegativeSpec` (what must not, with `illTyped`). Two are programs, run by hand: `sbt "core/Test/runMain polyframes.RuntimeSpec"` (the binding to SparkSQL, piece by piece) and `sbt "core/Test/runMain polyframes.OpsSpec"` (the six operators end to end).
 
 ### Setup, once
 
