@@ -39,7 +39,7 @@ object OpsProbe {
     ))
     val docs = spark.createDataFrame(
       List(
-        Row(42, Row(Seq("alexis", "robert"), 25)),
+        Row(42, Row(Seq("ada", "alan"), 25)),
         Row(7, Row(Seq("maeva"), 30))
       ).asJava,
       docSchema
@@ -75,14 +75,14 @@ object OpsProbe {
 
     // 5. Inner join with a relational table.
     val cities = spark.createDataFrame(
-      List(Row(42, "Dijon"), Row(7, "Marseille")).asJava,
+      List(Row(42, "Lisbon"), Row(7, "Oslo")).asJava,
       StructType(Seq(StructField("person", IntegerType), StructField("city", StringType)))
     )
     val c0 = Data[Relation, SCity](cities)
     val joined = join[Document, "id" :: HNil, "person" :: HNil](d2, c0)
     val out = joined.df.select("id", "city").collect()
       .map(r => (r.getInt(0), r.getString(1))).toSet
-    assert(out == Set((42, "Dijon"), (7, "Marseille")), s"join output: $out")
+    assert(out == Set((42, "Lisbon"), (7, "Oslo")), s"join output: $out")
     println("5. inner join ok")
 
     spark.stop()

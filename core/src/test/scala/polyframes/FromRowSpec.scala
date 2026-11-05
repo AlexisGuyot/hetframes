@@ -28,10 +28,10 @@ object FromRowSpec {
     // A nested schema with a collection. The nested row is decoded by the
     // same instance, reached through FromCell.cellNested.
     val nested = implicitly[FromRow[SDoc]]
-    val n = nested(Row(42, Row(Seq("alexis", "robert"), 25)), 0)
+    val n = nested(Row(42, Row(Seq("ada", "alan"), 25)), 0)
     assert(n.head == 42, s"expected 42, got ${n.head}")
     val identity = n.tail.head
-    assert(identity.head == List("alexis", "robert"), s"got ${identity.head}")
+    assert(identity.head == List("ada", "alan"), s"got ${identity.head}")
     assert(identity.tail.head == 25, s"got ${identity.tail.head}")
 
     // A missing collection decodes to the empty list rather than failing.

@@ -38,7 +38,7 @@ object SparkProbe {
       StructField("id", IntegerType)
     ))
     val rows = List(
-      Row(Row(25, Seq("alexis", "robert")), 42),
+      Row(Row(25, Seq("ada", "alan")), 42),
       Row(Row(30, Seq("maeva")), 7)
     )
     val df = spark.createDataFrame(rows.asJava, schema)

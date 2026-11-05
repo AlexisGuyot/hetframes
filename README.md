@@ -6,7 +6,7 @@ PolyFrames is a typed layer over SparkSQL `DataFrame`s. It encodes the schema an
 
 It is a proof of concept, not a general-purpose library (yet). Its kernel implements the rules of the article and nothing beyond them.
 
-**Declaration of generative AI and AI-assisted technologies :** The Opus 4.8 model of the generative AI Claude was used to accelerate, standardise and document the development of the Proof of Concept, as well as to generate several tests, based on the article and a preliminary version of the project (see https://github.com/AlexisGuyot/Pridwen/tree/master/src/main/scala). The generated code was meticulously reviewed and verified at every stage of the process.
+**Declaration of generative AI and AI-assisted technologies :** Models of the Claude family (Opus 4.8, then Opus 5.5 for the revision of the experiments and of the collection handling) were used to accelerate, standardise and document the development of the Proof of Concept, as well as to generate several tests, based on the article and a preliminary version of the project (see https://github.com/AlexisGuyot/Pridwen/tree/master/src/main/scala). The generated code was meticulously reviewed and verified at every stage of the process.
 
 ## Reproducing the experiments
 
