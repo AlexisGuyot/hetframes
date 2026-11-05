@@ -3,14 +3,9 @@ package polyframes.bench
 import java.nio.file.{Files, Path, Paths}
 
 /**
- * Where the project is on disk.
- *
- * Nothing here may depend on the directory a program happens to be
- * launched from. sbt runs a forked process from the base directory of the
- * subproject, an IDE from wherever it likes, and a reviewer following the
- * README from the root of the repository. The root is therefore found by
- * walking up from the current directory until a build.sbt appears, and
- * every path the harness uses is resolved against it.
+ * Where the project is on disk: the first directory holding a build.sbt,
+ * walking up from the current one, whatever directory a program is
+ * launched from (sbt, an IDE, a shell).
  */
 object Workspace {
 
@@ -30,24 +25,17 @@ object Workspace {
     resolve("data", s"products-$products.jsonl").toString
 
   /**
-   * Where a pipeline writes its result.
-   *
-   * A fresh directory every time, outside the repository. Spark clears an
-   * output directory before writing to it, and on Windows that clearing
-   * fails on files a previous run left behind, so a stable path turns the
-   * second measurement of a pipeline into an error. Nothing here needs the
-   * output to be kept: writing it is how a pipeline is made to run, and
-   * how a sink that only accepts relational data is made to complain.
+   * A fresh output directory for each write, outside the repository: on
+   * Windows, Spark fails to clear one a previous run left behind. The output
+   * is never read; writing it is what makes a pipeline run.
    */
   def out(name: String): String =
     Paths.get(outBase.toString, s"$name-${System.nanoTime()}").toString
 
   /**
-   * Where the runs write. The system temporary folder by default; the
-   * environment variable `POLYFRAMES_OUT`, or the system property of the
-   * same name, overrides it. On Windows, pointing it to a folder excluded
-   * from real-time antivirus scanning avoids intermittent "Mkdirs failed"
-   * errors, Spark creating many short-lived directories in parallel.
+   * The system temporary folder, unless the property or environment
+   * variable `POLYFRAMES_OUT` says otherwise (on Windows, a folder excluded
+   * from antivirus scanning avoids intermittent "Mkdirs failed" errors).
    */
   private def outBase: Path =
     sys.props.get("POLYFRAMES_OUT").orElse(sys.env.get("POLYFRAMES_OUT"))
@@ -65,7 +53,6 @@ object Workspace {
     }
   }
 
-  /** The reference table P2 integrates with. Versioned with the code, not
-    * extracted from the dump, and therefore outside data/. */
+  /** The reference table P2 integrates with, versioned with the code. */
   def grades: String = resolve("reference", "nutriscore-grades.csv").toString
 }

@@ -1,9 +1,8 @@
 package polyframes.bench
 
 import java.net.{URL, URLClassLoader}
-import java.nio.file.{Files, Path}
+import java.nio.file.Path
 
-import scala.reflect.io.Directory
 import scala.util.control.NonFatal
 
 /** What running one program produced. */
@@ -15,20 +14,13 @@ final case class RunOutcome(
 )
 
 /**
- * Runs a program and watches what it costs.
- *
- * Memory is sampled rather than computed: a thread polls the used heap
- * while the program runs and keeps the highest reading. That is a coarse
- * instrument. It sees the whole JVM, not the pipeline alone, and what it
- * reports depends on when the collector happens to run. It is used here to
- * compare three pipelines doing the same work in the same conditions, not
- * to state what any of them requires.
+ * Runs a program, timing it and sampling the used heap every 50 ms. The
+ * heap reading is coarse (the whole JVM, at the collector's mercy): it
+ * compares pipelines run in the same conditions, nothing more.
  */
 object Runner {
 
-  /** The deepest cause, named and quoted. Reflection wraps what a program
-    * throws in two or three layers, and the outermost of them says nothing
-    * about why the program failed. */
+  /** The deepest cause: reflection wraps the real one in several layers. */
   private def describe(t: Throwable): String = {
     val root = Iterator.iterate(t)(_.getCause).takeWhile(_ != null).toList.last
     val msg = Option(root.getMessage).map(_.linesIterator.next().trim).getOrElse("")
@@ -69,47 +61,27 @@ object Runner {
     RunOutcome(failure.isEmpty, elapsed, peak, failure)
   }
 
-  /**
-   * Compiles a variant to a directory of its own, loads it there, and runs
-   * its main method. The variants that compile have to be run this way:
-   * they are not part of any source set, so nothing else puts them on a
-   * classpath.
-   */
+  /** Compiles a variant into a directory of its own, loads it, runs its `main`. */
   def compileAndRun(source: Path, objectName: String, args: Array[String]): RunOutcome = {
-    val out = Files.createTempDirectory("polyframes-run")
-    try {
+    Compiler.withTempDir("polyframes-run") { out =>
       val compiled = Compiler.compileTo(source, out)
       if (!compiled.compiles)
         RunOutcome(runs = false, 0L, 0L, "did not compile: " + compiled.firstError)
       else {
-        // Only the freshly compiled directory goes in the child loader.
-        // Giving it no parent would reload Spark in isolation, and Spark
-        // does not survive that: its static initialisers fail, and every
-        // variant then dies of the same unrelated cause before reaching
-        // the error it was written to exhibit.
+        // The child loader holds only the compiled directory and delegates
+        // to the harness's loader: reloading Spark in isolation breaks its
+        // static initialisers. The context loader is set for the parts of
+        // Spark that read it (not encoder derivation: see VariantClasses).
         val loader = new URLClassLoader(Array[URL](out.toUri.toURL), getClass.getClassLoader)
-        // Set for the parts of Spark that read it. Note that it is not
-        // enough for encoder derivation, which goes through the mirror
-        // carried by a type tag captured at compile time rather than
-        // through the thread's loader: a case class a variant declares
-        // itself stays invisible to it. See VariantClasses.
         val previous = Thread.currentThread().getContextClassLoader
         Thread.currentThread().setContextClassLoader(loader)
         try measure { () =>
-          // A top-level Scala object compiles to a class named X$ whose
-          // main is an instance method, and to a class named X carrying a
-          // static forwarder to it. It is the forwarder that can be called
-          // with a null receiver; the module class cannot.
-          val cls = loader.loadClass(objectName)
-          val main = cls.getMethod("main", classOf[Array[String]])
-          main.invoke(null, args)
+          // The class X (not X$) carries the static forwarder to main.
+          loader.loadClass(objectName).getMethod("main", classOf[Array[String]]).invoke(null, args)
           ()
         }
         finally Thread.currentThread().setContextClassLoader(previous)
       }
-    } finally {
-      Directory(out.toFile).deleteRecursively()
-      ()
     }
   }
 }

@@ -4,17 +4,19 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 
 import scala.io.Source
-import scala.util.Using
+import scala.util.{Try, Using}
 
 /**
- * Reads results.csv and writes a reading of it.
- *
- * Kept apart from the programs that measure, so that the report can be
- * rebuilt without measuring again, and so that nothing it says can come
- * from anywhere but the file.
+ * Writes RESULTS.md from results.csv, and from nothing else, so that the
+ * report can be rebuilt without measuring again.
  */
 object Report {
 
+  final case class Row(experiment: String, subject: String, baseline: String,
+                       family: String, volume: String, width: String,
+                       metric: String, value: String, note: String)
+
+  /** One CSV line, with quoted cells and doubled quotes. */
   private def parse(line: String): List[String] = {
     val out = List.newBuilder[String]
     val cell = new StringBuilder
@@ -36,9 +38,19 @@ object Report {
     out.result()
   }
 
-  final case class Row(experiment: String, subject: String, baseline: String,
-                       family: String, volume: String, width: String,
-                       metric: String, value: String, note: String)
+  /** A markdown table, in the layout RESULTS.md has always had. */
+  private def table(header: Seq[String], rows: Seq[Seq[String]]): String = {
+    def line(cells: Seq[String]) = cells.mkString("| ", " | ", " |\n")
+    line(header) + header.map(_ => "---").mkString("|", "|", "|\n") + rows.map(line).mkString
+  }
+
+  private val Families = List(
+    "noattr" -> "an attribute absent from the schema",
+    "badtype" -> "an attribute of an unexpected domain",
+    "badmodel" -> "data in an unexpected model",
+    "badtransfo" -> "a transformation breaking the announced model")
+  private val Baselines = List("polyframes" -> "pf", "dataframe" -> "df", "dataset" -> "ds")
+  private val Correct = List("p1", "p1-dataframe", "p1-dataset", "p2", "p2-dataframe", "p2-dataset")
 
   def main(args: Array[String]): Unit = {
     if (!Files.exists(Results.path)) {
@@ -52,7 +64,10 @@ object Report {
       }.toList
     }
 
-    def find(p: Row => Boolean): Option[String] = rows.find(p).map(_.value)
+    /** The first value recorded for a subject and a metric (and a volume). */
+    def value(subject: String, metric: String, volume: String = null): Option[String] =
+      rows.find(r => r.subject == subject && r.metric == metric &&
+        (volume == null || (r.experiment == "volume" && r.volume == volume))).map(_.value)
 
     val sb = new StringBuilder
     sb ++= "# Results\n\n"
@@ -61,85 +76,51 @@ object Report {
     sb ++= "The machine, the pinned versions and the extracted data are described in\n"
     sb ++= "`README.md` and `data/PROVENANCE.txt`.\n\n"
 
-    // --- where each error is caught ---
-    val families = List(
-      "noattr" -> "an attribute absent from the schema",
-      "badtype" -> "an attribute of an unexpected domain",
-      "badmodel" -> "data in an unexpected model",
-      "badtransfo" -> "a transformation breaking the announced model")
-    val baselines = List("polyframes" -> "pf", "dataframe" -> "df", "dataset" -> "ds")
-
+    // Where each error is caught.
     List(("P1", ""), ("P2", "2")).foreach { case (pipeline, suffix) =>
-    sb ++= s"## Where each error is caught, $pipeline\n\n"
-    sb ++= "| error | " + baselines.map(_._1).mkString(" | ") + " |\n"
-    sb ++= "|---|" + baselines.map(_ => "---").mkString("|") + "|\n"
-    families.foreach { case (family, label) =>
-      val cells = baselines.map { case (_, prefix) =>
-        val name = s"$prefix$suffix-$family"
-        find(r => r.subject == name && r.metric == "compiles") match {
-          case Some("false") => "compile time"
-          case Some("true") =>
-            find(r => r.subject == name && r.metric == "runs") match {
-              case Some("false") => "run time"
-              case Some("true")  => "**not detected**"
-              case _             => "not run"
-            }
-          case _ => "-"
+      sb ++= s"## Where each error is caught, $pipeline\n\n"
+      sb ++= table("error" +: Baselines.map(_._1), Families.map { case (family, label) =>
+        label +: Baselines.map { case (_, prefix) =>
+          val name = s"$prefix$suffix-$family"
+          (value(name, "compiles"), value(name, "runs")) match {
+            case (Some("false"), _)          => "compile time"
+            case (Some("true"), Some("false")) => "run time"
+            case (Some("true"), Some("true"))  => "**not detected**"
+            case (Some("true"), _)           => "not run"
+            case _                           => "-"
+          }
         }
-      }
-      sb ++= s"| $label | " + cells.mkString(" | ") + " |\n"
-    }
-    sb ++= "\n"
+      })
+      sb ++= "\n"
     }
 
-    // --- compilation of the correct pipelines ---
     sb ++= "## Compiling the correct pipelines\n\n"
-    sb ++= "| pipeline | compilation (ms) |\n|---|---|\n"
-    List("p1", "p1-dataframe", "p1-dataset", "p2", "p2-dataframe", "p2-dataset").foreach { s =>
-      sb ++= s"| $s | ${find(r => r.subject == s && r.metric == "compile-ms").getOrElse("-")} |\n"
-    }
+    sb ++= table(Seq("pipeline", "compilation (ms)"),
+      Correct.map(s => Seq(s, value(s, "compile-ms").getOrElse("-"))))
 
-    // --- running the correct pipelines ---
     val volumes = rows.filter(_.experiment == "volume").map(_.volume).distinct
-      .flatMap(v => scala.util.Try(v.toInt).toOption).sorted
+      .flatMap(v => Try(v.toInt).toOption).sorted
     if (volumes.nonEmpty) {
-      val subjects = List("p1", "p1-dataframe", "p1-dataset", "p2", "p2-dataframe", "p2-dataset")
       sb ++= "\n## Running the correct pipelines\n\n"
-      sb ++= "| products | " + subjects
-        .flatMap(s => List(s"$s ms", s"$s MB")).mkString(" | ") + " |\n"
-      sb ++= "|---|" + (1 to subjects.size * 2).map(_ => "---").mkString("|") + "|\n"
-      volumes.foreach { n =>
-        val cells = subjects.flatMap { s =>
-          List(
-            find(r => r.experiment == "volume" && r.subject == s &&
-              r.volume == n.toString && r.metric == "run-ms").getOrElse("-"),
-            find(r => r.experiment == "volume" && r.subject == s &&
-              r.volume == n.toString && r.metric == "heap-mb").getOrElse("-"))
-        }
-        sb ++= s"| $n | " + cells.mkString(" | ") + " |\n"
-      }
+      sb ++= table("products" +: Correct.flatMap(s => List(s"$s ms", s"$s MB")),
+        volumes.map { n =>
+          n.toString +: Correct.flatMap(s => List("run-ms", "heap-mb")
+            .map(m => value(s, m, n.toString).getOrElse("-")))
+        })
     }
 
-    // --- width ---
     val widths = rows.filter(_.experiment == "width")
-      .flatMap(r => scala.util.Try(r.width.toInt).toOption.map(_ -> r.value)).sortBy(_._1)
+      .flatMap(r => Try(r.width.toInt).toOption.map(_ -> r.value)).sortBy(_._1)
     if (widths.nonEmpty) {
       sb ++= "\n## Compiling a declaration of growing width\n\n"
-      sb ++= "| declared attributes | compilation (ms) |\n|---|---|\n"
-      widths.foreach { case (w, v) => sb ++= s"| $w | $v |\n" }
+      sb ++= table(Seq("declared attributes", "compilation (ms)"),
+        widths.map { case (w, v) => Seq(w.toString, v) })
     }
 
-    // A guard against the failure mode that once made this table look right
-    // for the wrong reason: variants dying of something the harness did
-    // rather than of the error each was written to exhibit.
-    //
-    // The test is not that a message repeats. Variants of one family are
-    // meant to fail alike, and do: every badmodel variant hits the same
-    // multi-valued attribute at the sink, whichever API wrote it. What
-    // would be suspicious is one message shared across families, since
-    // four different mistakes have no reason to produce one failure.
-    val failures = rows.filter(r => r.metric == "runs" && r.value == "false")
-      .filter(_.note.nonEmpty)
+    // Guard: variants of one family may share a failure message, but one
+    // message shared across families means the harness, not the injected
+    // error, made them fail.
+    val failures = rows.filter(r => r.metric == "runs" && r.value == "false" && r.note.nonEmpty)
     val acrossFamilies = failures.groupBy(_.note)
       .filter { case (_, all) => all.map(_.family).distinct.size > 1 }
     if (acrossFamilies.nonEmpty) {
@@ -153,10 +134,8 @@ object Report {
     }
 
     sb ++= "\n## What each baseline reports, and when\n\n"
-    sb ++= "| variant | failure |\n|---|---|\n"
-    failures.foreach { r =>
-      sb ++= s"| ${r.subject} | ${r.note.take(120).replace("|", "\\|")} |\n"
-    }
+    sb ++= table(Seq("variant", "failure"),
+      failures.map(r => Seq(r.subject, r.note.take(120).replace("|", "\\|"))))
 
     sb ++= "\n## Reading these figures\n\n"
     sb ++= "Compilation is timed in process, on a warm JVM: every file is compiled\n"

@@ -5,11 +5,8 @@ import org.apache.spark.sql.functions.{col, count}
 import org.apache.spark.sql.types.{ArrayType, StructType}
 
 /**
- * Reports what the extracted sample actually contains, so that the schemas
- * declared in Schemas.scala rest on observed fields rather than on guessed
- * ones. Nothing here is part of the library or of the measurements: it is
- * a survey run once, whose output settles which attributes the pipelines
- * of section 5 will declare.
+ * A one-off survey of the extracted sample, used to choose the attributes
+ * declared in Schemas.scala. Not part of the measurements.
  *
  *   sbt "bench/runMain polyframes.bench.Inspect"
  */
@@ -25,10 +22,7 @@ object Inspect {
     val total = df.count()
     println(s"=== $path : $total products, ${df.schema.fields.length} top-level fields ===\n")
 
-    // Top-level fields, by how often they are populated. Only atomic and
-    // array-of-atomic fields are listed: those are the ones the declared
-    // schemas can use, given that Shape does not materialise collections
-    // of nested schemas.
+    // Only atomic and array-of-atomic fields: the ones a schema can use.
     val usable = df.schema.fields.filter { f =>
       f.dataType match {
         case _: StructType                            => false
@@ -36,9 +30,7 @@ object Inspect {
         case _                                        => true
       }
     }
-    // One aggregation for every field at once. Counting them one by one
-    // means one Spark job per field, which on a record of this width takes
-    // minutes rather than seconds.
+    // One aggregation for all fields: one job per field would take minutes.
     val row = df.select(usable.map(f => count(col(s"`${f.name}`")).as(f.name)).toIndexedSeq: _*).head()
     val counts = usable.zipWithIndex.map { case (f, i) =>
       (f.name, f.dataType.simpleString, row.getLong(i))

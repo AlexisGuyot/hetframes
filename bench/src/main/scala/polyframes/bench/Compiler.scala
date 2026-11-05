@@ -3,7 +3,7 @@ package polyframes.bench
 import java.nio.file.{Files, Path}
 
 import scala.reflect.io.{Directory, PlainDirectory}
-import scala.tools.nsc.reporters.StoreReporter
+import scala.tools.nsc.reporters.{Reporter, StoreReporter}
 import scala.tools.nsc.{Global, Settings}
 
 /** What compiling one file produced. */
@@ -14,31 +14,33 @@ final case class CompileOutcome(
 )
 
 /**
- * Compiles one source file at a time, against the classpath of the
- * harness itself.
- *
- * Compiling in process rather than by launching sbt once per file has two
- * reasons. It measures the compilation and nothing else, where a fresh sbt
- * would also measure its own startup and its dependency resolution; and it
- * lets a file that must fail to compile do so without stopping the others,
- * which is why the erroneous variants live outside the source tree in the
- * first place.
- *
- * The price is that the compiler runs on a warm JVM. A timing taken this
- * way is lower than what a user waiting on a cold sbt would see, so the
- * figures reported are useful for comparing variants with one another
- * rather than as absolute costs. The harness discards the first run of
- * each file for the same reason.
+ * Compiles one file at a time, in process, against the classpath of the
+ * harness. In process rather than through sbt, so that only compilation is
+ * timed, and so that a file that must fail does not stop the others. The
+ * JVM is therefore warm: the figures compare files, they are not absolute.
  */
 object Compiler {
 
-  /** The classpath of the forked JVM running the harness, which sbt has
-    * already populated with Spark, Shapeless and the compiled library. */
+  /** Already holds Spark, Shapeless and the library (set up by sbt). */
   private val classpath: String = sys.props("java.class.path")
 
-  /** Reports how long the current file has been compiling, so that a
-    * compilation that has stopped making progress is visible within the
-    * minute rather than after an afternoon. */
+  /** A fresh compiler writing into `out`. */
+  def newGlobal(out: Path, reporter: Settings => Reporter): Global = {
+    val settings = new Settings()
+    settings.classpath.value = classpath
+    settings.usejavacp.value = false
+    settings.outputDirs.setSingleOutput(new PlainDirectory(new Directory(out.toFile)))
+    new Global(settings, reporter(settings))
+  }
+
+  /** Runs `body` with a temporary directory, deleted afterwards. */
+  def withTempDir[A](prefix: String)(body: Path => A): A = {
+    val dir = Files.createTempDirectory(prefix)
+    try body(dir)
+    finally { Directory(dir.toFile).deleteRecursively(); () }
+  }
+
+  /** Prints a line every 30 s, so that a stuck compilation shows. */
   private def beat(name: String, startedNanos: Long): Thread = {
     val t = new Thread(() => {
       try while (!Thread.currentThread().isInterrupted) {
@@ -52,72 +54,37 @@ object Compiler {
     t
   }
 
-  def compile(source: Path): CompileOutcome = {
-    val out = Files.createTempDirectory("polyframes-compile")
-    try compileTo(source, out)
-    finally {
-      Directory(out.toFile).deleteRecursively()
-      ()
-    }
-  }
+  def compile(source: Path): CompileOutcome =
+    withTempDir("polyframes-compile")(out => compileTo(source, out))
 
-  /** Compiles into a directory the caller owns, so that what was produced
-    * can afterwards be loaded and run. */
+  /** Compiles into a directory the caller owns, to load and run it after. */
   def compileTo(source: Path, out: Path): CompileOutcome = {
-    {
-      val settings = new Settings()
-      settings.classpath.value = classpath
-      settings.usejavacp.value = false
-      settings.outputDirs.setSingleOutput(
-        new PlainDirectory(new Directory(out.toFile))
-      )
+    var store: StoreReporter = null
+    val global = newGlobal(out, s => { store = new StoreReporter(s); store })
 
-      val reporter = new StoreReporter(settings)
-      val global = new Global(settings, reporter)
+    val started = System.nanoTime()
+    val heartbeat = beat(source.getFileName.toString, started)
+    try new global.Run().compile(List(source.toAbsolutePath.toString))
+    finally heartbeat.interrupt()
+    val elapsed = (System.nanoTime() - started) / 1000000L
 
-      val started = System.nanoTime()
-      val heartbeat = beat(source.getFileName.toString, started)
-      try new global.Run().compile(List(source.toAbsolutePath.toString))
-      finally heartbeat.interrupt()
-      val elapsed = (System.nanoTime() - started) / 1000000L
+    val error = store.infos
+      .find(_.severity == store.ERROR)
+      .map(i => i.msg.linesIterator.next().trim)
+      .getOrElse("")
 
-      val error = reporter.infos
-        .find(_.severity == reporter.ERROR)
-        .map(i => i.msg.linesIterator.next().trim)
-        .getOrElse("")
+    // A Global indexes the whole classpath, Spark included; left to pile
+    // up, a few dozen of them fill the heap and the run stalls in GC.
+    global.close()
+    System.gc()
 
-      // A Global holds a symbol table indexed over the whole classpath,
-      // Spark included. Left to accumulate, a few dozen of them fill any
-      // heap and the run collapses into garbage collection, which looks
-      // from outside like a compilation that never ends.
-      global.close()
-      System.gc()
-
-      CompileOutcome(!reporter.hasErrors, elapsed, error)
-    }
+    CompileOutcome(!store.hasErrors, elapsed, error)
   }
 
-  /**
-   * Compiles a set of files in interleaved rounds and keeps, for each file,
-   * the median of its `rounds` timings.
-   *
-   * The JVM running the compiler warms up as it goes: the classes of the
-   * compiler and of the libraries on the classpath are loaded, then
-   * compiled to native code, during the first compilations, whatever file
-   * they compile. Timing the files one after the other, each several times
-   * in a row, therefore charges that warm-up to whichever file comes first,
-   * and the order of the list decides part of the result. Here every file
-   * is first compiled once, unmeasured; then every round compiles every
-   * file once, in the same order, so that each file is measured as often,
-   * and in the same state of the JVM, as the others.
-   */
-  def timedInterleaved(sources: Seq[Path], rounds: Int): Map[Path, CompileOutcome] = {
-    sources.foreach(s => compile(s))                         // warm-up, discarded
-    val measured = (1 to rounds).map(_ => sources.map(s => s -> compile(s)))
-    sources.map { s =>
-      val outcomes = measured.map(_.collectFirst { case (`s`, o) => o }.get)
-      val times = outcomes.map(_.millis).sorted
-      s -> outcomes.head.copy(millis = times(times.length / 2))
-    }.toMap
-  }
+  /** Every file compiled per `Protocol.interleaved`; the median time is kept. */
+  def timedInterleaved(sources: Seq[Path], rounds: Int): Map[Path, CompileOutcome] =
+    Protocol.interleaved(sources, rounds)(s => { compile(s); () })(compile)
+      .map { case (s, outcomes) =>
+        s -> outcomes.head.copy(millis = Protocol.median(outcomes.map(_.millis)))
+      }.toMap
 }

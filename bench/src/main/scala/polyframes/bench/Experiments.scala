@@ -3,42 +3,45 @@ package polyframes.bench
 import java.nio.file.Files
 
 /**
- * The protocol of section 5, in four programs.
- *
- *   sbt experiments
- *
- * which is an alias for running the four below in turn, each in a JVM of
- * its own. That separation is not a matter of tidiness, and it was arrived
- * at twice by experiment.
- *
- * Compiling and running cannot share a process: the compilation phase
- * leaves the compiler's own heap behind, and it would be counted as the
- * memory a pipeline requires. Measuring the two together gave figures that
- * disagreed with themselves.
- *
- * Nor can the two compilation phases: a fresh compiler is instantiated for
- * every file, and after a hundred of them the process spends its time
- * collecting garbage rather than compiling. The width axis is measured
- * first, and alone, because it is the phase whose figures are most
- * sensitive to that.
+ * The protocol of section 5, in four programs that `sbt experiments` runs
+ * in turn, each in a JVM of its own: CompileWidth, CompileVariants,
+ * RunExperiments, then Report. Compiling and running are kept apart so
+ * that the compiler's heap is not counted as a pipeline's, and the width
+ * axis is measured first and alone because it is the most sensitive to
+ * the state of the heap after many compilations.
  */
-/** The number of measured rounds, used when no argument is given, so that
-  * `sbt experiments` reproduces the protocol of the article as is. Odd, so
-  * that the median is one of the measurements. */
 object Protocol {
+
+  /** Measured rounds when no argument is given. Odd, so that the median is
+    * one of the measurements. */
   val Rounds: Int = 5
+
+  def median(xs: Seq[Long]): Long = { val s = xs.sorted; s(s.length / 2) }
+
+  /**
+   * One unmeasured pass over `keys` (`warm`), then `rounds` passes measuring
+   * every key once, in the same order, so that no key is measured in a JVM
+   * warmer or colder than the others. Returns every measurement of each key.
+   */
+  def interleaved[K, O](keys: Seq[K], rounds: Int)(warm: K => Unit)(measure: K => O): Seq[(K, Seq[O])] = {
+    keys.foreach(warm)
+    val measured = (1 to rounds).map(_ => keys.map(measure))
+    keys.indices.map(i => keys(i) -> measured.map(_(i)))
+  }
+
+  def roundsFrom(args: Array[String]): Int = args.headOption.map(_.toInt).getOrElse(Rounds)
+
+  def interleavedNote(rounds: Int): String = s"median of $rounds interleaved rounds"
 }
 
 object CompileWidth {
 
   def main(args: Array[String]): Unit = {
-    val runs = args.headOption.map(_.toInt).getOrElse(Protocol.Rounds)
+    val runs = Protocol.roundsFrom(args)
     println(s"project root: ${Workspace.root}")
 
-    // Preflight. Everything measured from here on leans on the library
-    // being visible to the compiler; if it is not, every file fails for
-    // the same irrelevant reason and the run says nothing at all. This is
-    // the first of the four programs, so it checks once for all of them.
+    // Preflight, once for the four programs: if the library is not visible
+    // to the compiler, every file would fail for that reason alone.
     val probe = Files.createTempFile("polyframes-probe", ".scala")
     Files.write(probe, ("object PolyFramesProbe { " +
       "val m: polyframes.types.Model = null; " +
@@ -62,11 +65,6 @@ object CompileWidth {
 
     Results.start()
 
-    // Measured first, and in a process of its own. A Global is created per
-    // compilation, and the state of the heap after a hundred of them is
-    // not the state a measurement should be taken in: the figures of this
-    // axis moved by a factor of three between two runs for that reason
-    // alone, before the phases were separated.
     println("\n=== compiling declarations of growing width ===")
     val timed = Compiler.timedInterleaved(Variants.Widths.map(_._2.source), runs)
     Variants.Widths.foreach { case (width, v) =>
@@ -75,7 +73,7 @@ object CompileWidth {
         o.firstError.take(60))
       Results.append(Measurement("width", v.name, "polyframes", "none", "",
         width.toString, "compile-ms", o.millis.toString,
-        if (o.compiles) s"median of $runs interleaved rounds" else o.firstError))
+        if (o.compiles) Protocol.interleavedNote(runs) else o.firstError))
     }
 
     println(s"\nAppended to ${Results.path}")
@@ -85,7 +83,7 @@ object CompileWidth {
 object CompileVariants {
 
   def main(args: Array[String]): Unit = {
-    val runs = args.headOption.map(_.toInt).getOrElse(Protocol.Rounds)
+    val runs = Protocol.roundsFrom(args)
     println(s"project root: ${Workspace.root}")
 
     println("\n=== compiling every variant ===")
@@ -99,7 +97,7 @@ object CompileVariants {
         Measurement("error-prevention", v.name, v.baseline, v.family, "", "",
           "compiles", o.compiles.toString, o.firstError),
         Measurement("error-prevention", v.name, v.baseline, v.family, "", "",
-          "compile-ms", o.millis.toString, s"median of $runs interleaved rounds")
+          "compile-ms", o.millis.toString, Protocol.interleavedNote(runs))
       ))
     }
 
@@ -107,30 +105,21 @@ object CompileVariants {
   }
 }
 
-/**
- * Runs what compiles, and measures what the correct pipelines cost.
- *
- * One protocol throughout: after an unmeasured round, every figure is the
- * median of `runs` interleaved rounds, and every volume point is measured
- * the same way, the smallest one included. There is no separate overhead
- * measurement, because a separate measurement means a differently warmed
- * JVM and figures that cannot be compared with the rest.
- */
+/** Runs the variants that compile, then times the correct pipelines at each volume. */
 object RunExperiments {
 
+  val reference: Int = 10000
+
   def main(args: Array[String]): Unit = {
-    val runs = args.headOption.map(_.toInt).getOrElse(Protocol.Rounds)
+    val runs = Protocol.roundsFrom(args)
     println(s"project root: ${Workspace.root}")
     Workspace.clearOut()
+    val inputs = Array(Workspace.data(reference), Workspace.grades)
 
-    // Preflight. The variants are compiled and loaded through machinery of
-    // the harness's own, and if that machinery is broken every one of them
-    // fails for the same irrelevant reason while appearing to confirm what
-    // was expected of it. So a pipeline known to work is put through the
-    // very same path first.
-    val check = Runner.compileAndRun(
-      Variants.All.head.source, Variants.All.head.objectName,
-      Array(Workspace.data(reference), Workspace.grades))
+    // Preflight: a pipeline known to work goes through the same loading
+    // machinery first, so that a broken harness cannot pass for variants
+    // failing as expected.
+    val check = Runner.compileAndRun(Variants.All.head.source, Variants.All.head.objectName, inputs)
     if (!check.runs) {
       System.err.println("The reference pipeline does not run through the harness: " + check.failure)
       System.err.println("Nothing can be concluded from the variants until this passes.")
@@ -140,8 +129,7 @@ object RunExperiments {
 
     println("\n=== running the variants that compile ===")
     Variants.All.filter(_.family != "none").foreach { v =>
-      val o = Runner.compileAndRun(v.source, v.objectName,
-        Array(Workspace.data(RunExperiments.reference), Workspace.grades))
+      val o = Runner.compileAndRun(v.source, v.objectName, inputs)
       if (o.failure.startsWith("did not compile"))
         println(f"${v.name}%-15s (rejected at compile time, nothing to run)")
       else {
@@ -158,55 +146,50 @@ object RunExperiments {
 
     points.foreach { n =>
       val path = Workspace.data(n)
-      // One unmeasured round, then `runs` rounds in which each of the six
-      // pipelines runs once, in turn: no pipeline is measured in a JVM
-      // warmer or colder than the others.
-      Pipelines.Correct.foreach { case (name, _, run) =>
-        Pipelines.withSpark(s"$name-$n-warmup")(s => Runner.measure(() => run(s, path)))
-      }
-      val rounds = (1 to runs).map { _ =>
-        Pipelines.Correct.map { case (name, _, run) =>
-          name -> Pipelines.withSpark(s"$name-$n")(s => Runner.measure(() => run(s, path)))
-        }
-      }
-      Pipelines.Correct.foreach { case (name, baseline, _) =>
-        val outcomes = rounds.map(_.collectFirst { case (`name`, o) => o }.get)
-        val times = outcomes.map(_.millis).sorted
-        val heaps = outcomes.map(_.peakHeapMb).sorted
+      def runOnce(suffix: String)(p: Pipelines.Pipeline): RunOutcome =
+        Pipelines.withSpark(s"${p.name}-$n$suffix")(s => Runner.measure(() => p.run(s, path)))
+
+      val measured = Protocol.interleaved(Pipelines.Correct, runs)(
+        p => { runOnce("-warmup")(p); () })(runOnce(""))
+
+      measured.foreach { case (p, outcomes) =>
+        val time = Protocol.median(outcomes.map(_.millis))
+        val heap = Protocol.median(outcomes.map(_.peakHeapMb))
         val failed = outcomes.filterNot(_.runs).map(_.failure).headOption.getOrElse("")
-        println(f"$n%8d  $name%-15s ${times(times.length / 2)}%6d ms  " +
-          f"${heaps(heaps.length / 2)}%5d MB  $failed")
+        println(f"$n%8d  ${p.name}%-15s $time%6d ms  $heap%5d MB  $failed")
         Results.appendAll(Seq(
-          Measurement("volume", name, baseline, "none", n.toString, "", "run-ms",
-            times(times.length / 2).toString, s"median of $runs interleaved rounds"),
-          Measurement("volume", name, baseline, "none", n.toString, "", "heap-mb",
-            heaps(heaps.length / 2).toString, "peak sampled every 50 ms")
+          Measurement("volume", p.name, p.baseline, "none", n.toString, "", "run-ms",
+            time.toString, Protocol.interleavedNote(runs)),
+          Measurement("volume", p.name, p.baseline, "none", n.toString, "", "heap-mb",
+            heap.toString, "peak sampled every 50 ms")
         ))
       }
     }
     println(s"\nAppended to ${Results.path}")
   }
-
-  val reference: Int = 10000
 }
 
-/** The three correct pipelines, and how to run one. */
+/** The six correct pipelines, and how to run one. */
 object Pipelines {
 
-  type Run = (org.apache.spark.sql.SparkSession, String) => Unit
+  final case class Pipeline(
+      name: String,
+      baseline: String,
+      run: (org.apache.spark.sql.SparkSession, String) => Unit
+  )
 
-  val Correct: List[(String, String, Run)] = List(
-    ("p1", "polyframes",
+  val Correct: List[Pipeline] = List(
+    Pipeline("p1", "polyframes",
       (s, p) => Sink.typed(P1(s, p), Workspace.out("p1"))),
-    ("p1-dataframe", "dataframe",
+    Pipeline("p1-dataframe", "dataframe",
       (s, p) => Sink.untyped(P1DataFrame(s, p), Workspace.out("p1-dataframe"))),
-    ("p1-dataset", "dataset",
+    Pipeline("p1-dataset", "dataset",
       (s, p) => Sink.ofDataset(P1Dataset(s, p), Workspace.out("p1-dataset"))),
-    ("p2", "polyframes",
+    Pipeline("p2", "polyframes",
       (s, p) => Sink.typed(P2(s, p, Workspace.grades), Workspace.out("p2"))),
-    ("p2-dataframe", "dataframe",
+    Pipeline("p2-dataframe", "dataframe",
       (s, p) => Sink.untyped(P2DataFrame(s, p, Workspace.grades), Workspace.out("p2-dataframe"))),
-    ("p2-dataset", "dataset",
+    Pipeline("p2-dataset", "dataset",
       (s, p) => Sink.ofDataset(P2Dataset(s, p, Workspace.grades), Workspace.out("p2-dataset")))
   )
 

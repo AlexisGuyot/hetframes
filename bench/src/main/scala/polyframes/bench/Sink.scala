@@ -6,20 +6,9 @@ import polyframes.types.Relation
 import shapeless.HList
 
 /**
- * Writing the result of a pipeline to a CSV file.
- *
- * A sink of this kind accepts relational data and nothing else: a comma
- * separated file has no way of carrying a nested or a multi-valued
- * attribute. It is therefore the natural place at which the model of the
- * data stops being a matter of taste, and it is what the pipelines of
- * section 5 end on.
- *
- * The three versions below differ in when they say so. The typed one
- * requires its operand to be in the relational model, and refuses anything
- * else while the program is being compiled. The other two accept whatever
- * they are given, and leave Spark to discover the problem when the file is
- * actually written, which may be long after, and far from, the step that
- * caused it.
+ * The CSV sink every pipeline of section 5 ends on (appendix C, `writeCSV`).
+ * CSV only carries flat data: the typed version requires `Relation` at
+ * compile time, the other two leave Spark to fail when the file is written.
  */
 object Sink {
 
