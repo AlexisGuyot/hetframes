@@ -83,12 +83,14 @@ bench/       the measured pipelines, the baselines and the harness
 variants/    standalone pipeline variants, each compiled in isolation,
              including the ones that must fail to compile
 reference/   the hand-written reference table P2 integrates with
-scripts/     environment checks (check-env.sh, check-env.ps1)
+scripts/     environment checks (check-env.sh, check-env.ps1) and the
+             generator of VARIANTS.md (variants-review.py)
 MAPPING.md   article rule -> Scala construct -> file
 PROTOCOL.md  what the experiments measure, and how
 DATA.md      where the data come from, and under which licence
 results.csv  every figure the article reports
 RESULTS.md   a reading of results.csv
+VARIANTS.md  the erroneous variants side by side, with their outcomes
 ```
 
 ## Citing
