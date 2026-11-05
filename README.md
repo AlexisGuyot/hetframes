@@ -35,7 +35,7 @@ Common to every platform: a JDK 17 or 21 (Spark 4 supports neither Java 8 nor Ja
 4. keep the project at a short path without spaces, such as `C:\dev\polyframes`;
 5. exclude the project folder and the `.sbt`, `.ivy2` and `coursier` caches from real-time antivirus scanning. This is not cosmetic: scanning the build    caches inflates and destabilises compilation times, which are one of the three measurements reported.
 
-The pipelines write their results to a fresh directory under the system temporary folder rather than to a fixed path inside the repository.
+The pipelines write their results to a fresh directory under the system temporary folder rather than to a fixed path inside the repository. Spark creates many short-lived directories there, in parallel; if real-time scanning gets in the way (intermittent `IOException: Mkdirs failed to create ...`), either exclude that folder too, or point the runs to a folder already excluded, e.g. `set POLYFRAMES_OUT=C:\dev\polyframes-out` before launching sbt.
 
 Run `.\scripts\check-env.ps1` to confirm all five.
 

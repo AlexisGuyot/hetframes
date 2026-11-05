@@ -40,12 +40,23 @@ object Workspace {
    * how a sink that only accepts relational data is made to complain.
    */
   def out(name: String): String =
-    Paths.get(sys.props("java.io.tmpdir"), "polyframes-out",
-      s"$name-${System.nanoTime()}").toString
+    Paths.get(outBase.toString, s"$name-${System.nanoTime()}").toString
+
+  /**
+   * Where the runs write. The system temporary folder by default; the
+   * environment variable `POLYFRAMES_OUT`, or the system property of the
+   * same name, overrides it. On Windows, pointing it to a folder excluded
+   * from real-time antivirus scanning avoids intermittent "Mkdirs failed"
+   * errors, Spark creating many short-lived directories in parallel.
+   */
+  private def outBase: Path =
+    sys.props.get("POLYFRAMES_OUT").orElse(sys.env.get("POLYFRAMES_OUT"))
+      .map(Paths.get(_))
+      .getOrElse(Paths.get(sys.props("java.io.tmpdir"), "polyframes-out"))
 
   /** Best-effort removal of everything the runs above wrote. */
   def clearOut(): Unit = {
-    val base = Paths.get(sys.props("java.io.tmpdir"), "polyframes-out")
+    val base = outBase
     if (Files.exists(base)) {
       try {
         Files.walk(base).sorted(java.util.Comparator.reverseOrder[Path]())
