@@ -1,8 +1,8 @@
 Source: https://static.openfoodfacts.org/data/openfoodfacts-products.jsonl.gz
 Licence: Open Database License (ODbL). Contents under DbCL.
 Attribution: Data from Open Food Facts, licensed under the ODbL.
-Dump Last-Modified: Sun, 06 Sep 2026 06:40:35 GMT
-Retrieved: 2026-09-06T10:00:09.891884800Z
+Dump Last-Modified: Thu, 05 Nov 2026 05:26:03 GMT
+Retrieved: 2026-11-05T10:37:31.457200200Z
 Products kept: 500000
 Volume points: 10000, 50000, 100000, 250000, 500000
 
