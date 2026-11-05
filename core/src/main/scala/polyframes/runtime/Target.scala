@@ -19,15 +19,9 @@ object Names {
 }
 
 /**
- * The column a path designates, and the three ways of acting on it.
- *
- * A path of length one designates a column of the DataFrame; a longer one
- * designates a field nested inside it, reached with the `withField` and
- * `dropFields` operations SparkSQL provides on struct columns.
- *
- * None of these operations is required to leave the column in the position
- * the schema type gives it: the factory of `Data` re-selects the columns
- * in schema order afterwards, so position is not this type's concern.
+ * The column a path designates (a root column, or a field reached with
+ * `withField`/`dropFields`), and the ways of acting on it. Positions do not
+ * matter here: the factory of `Data` re-selects the columns in schema order.
  */
 @implicitNotFound("PolyFrames: ${P} is not a well-formed path.")
 trait Target[P <: HList] {

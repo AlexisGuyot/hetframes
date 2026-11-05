@@ -11,28 +11,17 @@ import shapeless.{HList, Witness}
 import java.util.concurrent.atomic.AtomicLong
 
 /**
- * The operators of the article.
+ * The operators of the article (rules 40 and 41, appendix C).
  *
- * Each is introduced in two stages. The model of the output and the paths
- * an operator acts on are types that no argument determines, so they have
- * to be supplied by hand; the schemas, the input model and the inferred
- * output schema are determined by the arguments and must not be. Scala
- * offers no way of supplying some type parameters and inferring the others
- * in a single application, so each operator is a method returning a small
- * object whose `apply` carries the rest.
+ * Each is applied in two stages, `add[Document, P](d)(f)`: the output model
+ * and the paths are supplied by hand, while the schemas and the inferred
+ * output schema must be inferred, and Scala 2 cannot mix the two in one
+ * application. Every operator ends with the factory of `Data`, which checks
+ * the output schema against the announced model and reorders the columns,
+ * which is all projection and removal need.
  *
- * The result reads exactly as the rules do:
- *
- *   add[Document, "identity" :: "adult" :: HNil](d)(f)
- *   project[Relation, LProj](d)
- *
- * with the paths and the announced model at the type level, and the data
- * at the term level.
- *
- * Every operator ends by handing its DataFrame to the factory of `Data`,
- * which checks the inferred schema against the announced model and lays
- * the columns out in schema order. Projection and removal need nothing
- * else: selecting the columns of the output schema performs both.
+ * The `reachable` premises have no counterpart in the rules: see
+ * `ObjectPath`.
  */
 object Ops {
 
@@ -62,7 +51,7 @@ object Ops {
 
   final class ProjectOp[MO <: Model, L <: HList] {
     def apply[M <: Model, S <: HList, NS <: HList](d: Data[M, S])(
-        implicit 
+        implicit
         reduce: Project.Aux[S, L, NS],
         valid: Valid[MO, NS],
         shape: Shape[NS],
@@ -72,7 +61,7 @@ object Ops {
 
   final class DropOp[MO <: Model, P <: HList] {
     def apply[M <: Model, S <: HList, NS <: HList](d: Data[M, S])(
-        implicit 
+        implicit
         reduce: Drop.Aux[S, P, NS],
         valid: Valid[MO, NS],
         shape: Shape[NS],
@@ -81,15 +70,13 @@ object Ops {
   }
 
   final class AddOp[MO <: Model, P <: HList] {
-    // The operand and the function sit in two parameter lists, not one.
-    // Scala infers a list as a whole, so with both in the same list the
-    // schema `S` would not yet be fixed when the function is typed, and
-    // its parameter would have to be annotated at every call site.
+    // Two parameter lists, so that `S` is fixed before `f` is typed and
+    // its parameter needs no annotation.
     def apply[M <: Model, S <: HList](d: Data[M, S]) = new Applied[M, S](d)
 
     final class Applied[M <: Model, S <: HList](d: Data[M, S]) {
       def apply[T, NS <: HList](f: S => T)(
-        implicit 
+        implicit
         reduce: Add.Aux[S, P, T, NS],
         valid: Valid[MO, NS],
         shape: Shape[NS],
@@ -107,7 +94,7 @@ object Ops {
 
     final class Applied[M <: Model, S <: HList](d: Data[M, S]) {
       def apply[T, NS <: HList](f: S => T)(
-        implicit 
+        implicit
         reduce: Update.Aux[S, P, T, NS],
         valid: Valid[MO, NS],
         shape: Shape[NS],
@@ -122,7 +109,7 @@ object Ops {
 
   final class RenameOp[MO <: Model, P <: HList, KNew <: String] {
     def apply[M <: Model, S <: HList, NS <: HList](d: Data[M, S])(
-        implicit 
+        implicit
         reduce: Rename.Aux[S, P, KNew, NS],
         valid: Valid[MO, NS],
         shape: Shape[NS],
@@ -134,26 +121,17 @@ object Ops {
   }
 
   /**
-   * Inner join on one attribute of each operand.
-   *
-   * The two join attributes must have the same domain, which the `=:=`
-   * premise requires. The two schemas must also disagree on no attribute
-   * name, since `Merge` reconciles homonymous attributes only when both
-   * are nested schemas: joining two schemas that share a plain attribute
-   * name is rejected at compile time rather than resolved by an arbitrary
-   * choice between the two.
-   *
-   * Known limitation: two sources sharing a nested attribute name type-check
-   * (Merge reconciles them into one nested attribute), but the binding to
-   * SparkSQL does not merge the two struct columns, and the result fails at
-   * run time. Attribute names are assumed unique across the two operands.
+   * Inner join on one attribute of each operand, of the same domain.
+   * `Merge` rejects two operands sharing an atomic attribute name. Known
+   * limitation: a shared nested attribute name type-checks, but the two
+   * struct columns are not merged and the result fails at run time.
    */
   final class JoinOp[MO <: Model, PL <: HList, PR <: HList] {
     def apply[
         ML <: Model, MR <: Model, SL <: HList, SR <: HList,
         TL, TR, NS <: HList
     ](left: Data[ML, SL], right: Data[MR, SR])(
-        implicit 
+        implicit
         keyLeft: Lookup.Aux[SL, PL, TL],
         keyRight: Lookup.Aux[SR, PR, TR],
         sameDomain: TL =:= TR,
@@ -177,19 +155,9 @@ object Ops {
   // -------------------------------------------------------------------
 
   /**
-   * Turns a function over records into a column expression.
-   *
-   * The function is registered as a user-defined function taking the whole
-   * record, then invoked on a struct of every column of the DataFrame.
-   * Since the columns of a DataFrame are always in the order of its schema
-   * type, that struct is a term of the schema type, which the decoder
-   * rebuilds. This is what gives `f` the type `S => T` rule 41 demands.
-   *
-   * The registered function is shipped to the executors, so it closes over
-   * two things that have to survive serialisation: `f`, which does because
-   * every Scala function does, and the decoder, which is serialisable for
-   * that reason alone. A function capturing something that is not will be
-   * rejected by Spark at run time, as any Spark job would be.
+   * Turns `f` into a column: a UDF applied to `struct(*)`, which is a term
+   * of the schema type since the columns are in schema order. Both `f` and
+   * the decoder are shipped to the executors, so both must be serialisable.
    */
   private def record[M <: Model, S <: HList, T](
       d: Data[M, S],

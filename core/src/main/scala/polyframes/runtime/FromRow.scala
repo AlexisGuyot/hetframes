@@ -7,23 +7,13 @@ import shapeless.{::, HList, HNil}
 import scala.annotation.implicitNotFound
 
 /**
- * Decoder for a single attribute domain.
+ * Decoder for one attribute domain. The instances mirror the domains the
+ * document model admits, so a domain the type system accepts is always
+ * decodable.
  *
- * The instances below mirror, one for one, the rules that define which
- * domains the document model admits: atomic values, collections whose
- * element domain is itself admissible, and nested schemas. 
- * A domain is decodable here exactly when the type system
- * accepts it there, so the decoder cannot be asked for a domain the system
- * would have rejected.
- *
- * A missing value decodes to the zero of its domain, and a missing
- * collection to the empty list. The type system has no notion of an
- * optional attribute (yet): an attribute is declared with a domain, and every
- * record is taken to carry a value of it. That is a simplification, and
- * the choice made here is to state it in one place rather than to let it
- * follow from how the JVM happens to unbox a null. Distinguishing an
- * absent value from a zero would call for optional attributes, which the
- * type system does not have.
+ * A missing value decodes to the zero of its domain, a missing collection
+ * to `Nil`: the type system has no optional attributes, and this states
+ * that simplification in one place rather than leaving it to unboxing.
  */
 @implicitNotFound("PolyFrames: no way to decode a value of domain ${T}.")
 trait FromCell[T] extends Serializable { def apply(value: Any): T }
@@ -45,7 +35,6 @@ object FromCell {
   implicit val cellDouble: FromCell[Double]   = orElse(0.0)
   implicit val cellBoolean: FromCell[Boolean] = orElse(false)
 
-  /** A collection, decoded element by element. */
   implicit def cellList[T](implicit element: FromCell[T]): FromCell[List[T]] =
     new FromCell[List[T]] {
       def apply(value: Any): List[T] = value match {
@@ -57,7 +46,6 @@ object FromCell {
       }
     }
 
-  /** A nested schema, decoded as a nested row. */
   implicit def cellNested[S <: HList](implicit inner: FromRow[S]): FromCell[S] =
     new FromCell[S] {
       def apply(value: Any): S = inner(value.asInstanceOf[Row], 0)
@@ -65,23 +53,13 @@ object FromCell {
 }
 
 /**
- * Decoder turning a DataFrame row into a term of the schema type `S`.
+ * Decoder from a row to a term of the schema type `S`, which gives the
+ * function of `add` and `update` its type `S => T` (rule 41).
  *
- * This is what gives the function passed to the augmentation operator the
- * type `S => T` that rule 41 requires. It has no counterpart in the
- * article: it belongs to the layer binding the type system to Spark.
- *
- * Decoding is positional. Callers must therefore hand it a row whose
- * columns are laid out in the order of the declared schema, which the
- * operators guarantee by building that row themselves rather than passing
- * the DataFrame row through.
- *
- * This trait and `FromCell` are the only members of the library that are
- * serialisable, and the only ones that need to be. Everything else runs
- * while the query plan is being built, on the driver; a decoder is shipped
- * to the executors along with the function it feeds, and runs there once
- * per record. The boundary between what the type system costs at compile
- * time and what it costs at run time is exactly this one.
+ * Decoding is positional: the operators hand it a row built in schema
+ * order. With `FromCell`, it is the only serialisable part of the library,
+ * since it is shipped to the executors and runs once per record; it is
+ * therefore the whole run-time cost of the type system.
  */
 @implicitNotFound("PolyFrames: no way to decode a row into the schema\n    ${S}")
 trait FromRow[S <: HList] extends Serializable { def apply(row: Row, from: Int): S }

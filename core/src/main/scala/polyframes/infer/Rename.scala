@@ -6,9 +6,8 @@ import shapeless.labelled.FieldType
 import scala.annotation.implicitNotFound
 
 /**
- * Schema obtained by giving the root attribute named `KOld` the new name
- * `KNew`. Encodes the two `RenameFlat` rules of appendix B. The domain and
- * the position of the attribute are preserved.
+ * Schema with the root attribute `KOld` renamed `KNew`, domain and
+ * position unchanged (appendix B, `RenameFlat`).
  */
 @implicitNotFound(
   "PolyFrames: no attribute named ${KOld} at the root of the schema\n    ${S}\n" +
@@ -27,7 +26,7 @@ object RenameFlat {
     }
 
   implicit def onTail[KOld, KNew, K2, T2, N <: HList, NN <: HList](
-      implicit 
+      implicit
       differ: KOld =:!= K2,
       next: Aux[N, KOld, KNew, NN]
   ): Aux[FieldType[K2, T2] :: N, KOld, KNew, FieldType[K2, T2] :: NN] =
@@ -36,7 +35,7 @@ object RenameFlat {
     }
 }
 
-/** Renaming of the attribute designated by a path. Appendix B, `Rename`. */
+/** Schema with the attribute at path `P` renamed `KNew` (appendix B, `Rename`). */
 @implicitNotFound(
   "PolyFrames: the path ${P} cannot be followed in the schema\n    ${S}"
 )
@@ -55,7 +54,7 @@ object Rename extends LowPriorityRename {
       S <: HList, K, P <: HList, KNew,
       Sub <: HList, NSub <: HList, NS <: HList
   ](
-      implicit 
+      implicit
       flat: LookupFlat.Aux[S, K, Sub],
       inner: Aux[Sub, P, KNew, NSub],
       back: UpdateFlat.Aux[S, K, NSub, NS]
@@ -68,7 +67,7 @@ trait LowPriorityRename {
       S <: HList, K, P <: HList, KNew,
       L, Sub <: HList, NSub <: HList, NS <: HList
   ](
-      implicit 
+      implicit
       flat: LookupFlat.Aux[S, K, L],
       list: ListOfSchema.Aux[L, Sub],
       inner: Rename.Aux[Sub, P, KNew, NSub],

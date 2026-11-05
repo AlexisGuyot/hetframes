@@ -6,15 +6,11 @@ import shapeless.labelled.FieldType
 import scala.annotation.implicitNotFound
 
 /**
- * Domain of the attribute named `K` at the root of the schema `S`.
+ * Domain of the root attribute `K` of `S` (appendix B, `LookupFlat`).
  *
- * Encodes the two `LookupFlat` rules of appendix B. `Out` is not bounded:
- * the domain found may be atomic, multi-valued or a nested schema, and the
- * rules that call upon `LookupFlat` discriminate on exactly that.
- *
- * There is no rule for `HNil`, so the reduction gets stuck when the schema
- * is exhausted without the attribute having been found. That is what makes
- * an operator applied to a missing attribute a compile-time error.
+ * No rule for `HNil`: looking up a missing attribute gets stuck, which is
+ * what makes it a compile-time error. Every `...Flat` type below follows
+ * the same pattern.
  */
 @implicitNotFound(
   "PolyFrames: no attribute named ${K} at the root of the schema\n    ${S}"
@@ -24,13 +20,11 @@ trait LookupFlat[S <: HList, K] { type Out }
 object LookupFlat {
   type Aux[S <: HList, K, O] = LookupFlat[S, K] { type Out = O }
 
-  /** The head attribute is the one sought. */
   implicit def onHead[K, T, N <: HList]: Aux[FieldType[K, T] :: N, K, T] =
     new LookupFlat[FieldType[K, T] :: N, K] { type Out = T }
 
-  /** The head attribute bears another name; carry on with the remainder. */
   implicit def onTail[K, K2, T2, N <: HList, O](
-      implicit 
+      implicit
       differ: K =:!= K2,
       next: Aux[N, K, O]
   ): Aux[FieldType[K2, T2] :: N, K, O] =
@@ -38,17 +32,14 @@ object LookupFlat {
 }
 
 /**
- * Domain of the attribute designated by the path `P` in the schema `S`.
+ * Domain of the attribute at path `P` (appendix B, `Lookup`). A path is an
+ * `HList` of singleton types: `K :: P` is the article's `Key(l) . P`.
  *
- * Encodes the three `Lookup` rules of appendix B. A path is an `HList` of
- * singleton types, so `K :: P` is the article's `Key(l) . P`.
- *
- * The two recursive rules have the same conclusion and differ only in what
- * `LookupFlat` yields for the head key: a nested schema in one case, a
- * collection of nested schemas in the other. Scala cannot discriminate two
- * instances by their premises alone, so the collection case is demoted to
- * the low-priority trait below. The compiler tries the nested-schema case
- * first and falls back to the other when it does not apply.
+ * The two recursive rules share a conclusion and differ only in what the
+ * head key leads to (a nested schema, or a collection of them). Scala
+ * cannot choose between instances by their premises, so the collection
+ * case sits in a low-priority trait and is tried second. `ProjectOne`,
+ * `Add`, `Update`, `Drop` and `Rename` are built the same way.
  */
 @implicitNotFound(
   "PolyFrames: the path ${P} cannot be followed in the schema\n    ${S}"
@@ -58,13 +49,11 @@ trait Lookup[S <: HList, P <: HList] { type Out }
 object Lookup extends LowPriorityLookup {
   type Aux[S <: HList, P <: HList, O] = Lookup[S, P] { type Out = O }
 
-  /** Path of length one: the attribute sits at the root of `S`. */
   implicit def onLast[S <: HList, K, T](
       implicit flat: LookupFlat.Aux[S, K, T]
   ): Aux[S, K :: HNil, T] =
     new Lookup[S, K :: HNil] { type Out = T }
 
-  /** Longer path, head key leading to a nested schema. */
   implicit def onNestedObject[S <: HList, K, P <: HList, Sub <: HList, T](
       implicit flat: LookupFlat.Aux[S, K, Sub],
       next: Aux[Sub, P, T]
@@ -74,9 +63,8 @@ object Lookup extends LowPriorityLookup {
 
 trait LowPriorityLookup {
 
-  /** Longer path, head key leading to a collection of nested schemas. */
   implicit def onNestedList[S <: HList, K, P <: HList, L, Sub <: HList, T](
-      implicit 
+      implicit
       flat: LookupFlat.Aux[S, K, L],
       list: ListOfSchema.Aux[L, Sub],
       next: Lookup.Aux[Sub, P, T]

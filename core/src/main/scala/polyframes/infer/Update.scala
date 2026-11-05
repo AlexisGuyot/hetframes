@@ -6,12 +6,8 @@ import shapeless.labelled.FieldType
 import scala.annotation.implicitNotFound
 
 /**
- * Schema obtained by giving the root attribute named `K` the new domain
- * `TNew`. Encodes the two `UpdateFlat` rules of appendix B.
- *
- * Nothing else changes: the name of the attribute, its position and every
- * other attribute are preserved. As with `LookupFlat`, there is no rule for
- * `HNil`, so updating an attribute a schema does not hold is rejected.
+ * Schema with the root attribute `K` given the domain `TNew`, name and
+ * position unchanged (appendix B, `UpdateFlat`).
  */
 @implicitNotFound(
   "PolyFrames: no attribute named ${K} at the root of the schema\n    ${S}\n" +
@@ -23,16 +19,14 @@ object UpdateFlat {
   type Aux[S <: HList, K, TNew, O <: HList] =
     UpdateFlat[S, K, TNew] { type Out = O }
 
-  /** The head attribute is the one to update. */
   implicit def onHead[K, TOld, TNew, N <: HList]
       : Aux[FieldType[K, TOld] :: N, K, TNew, FieldType[K, TNew] :: N] =
     new UpdateFlat[FieldType[K, TOld] :: N, K, TNew] {
       type Out = FieldType[K, TNew] :: N
     }
 
-  /** The head attribute bears another name; keep it and carry on. */
   implicit def onTail[K, TNew, K2, T2, N <: HList, NN <: HList](
-      implicit 
+      implicit
       differ: K =:!= K2,
       next: Aux[N, K, TNew, NN]
   ): Aux[FieldType[K2, T2] :: N, K, TNew, FieldType[K2, T2] :: NN] =
@@ -41,14 +35,7 @@ object UpdateFlat {
     }
 }
 
-/**
- * Schema obtained by giving the attribute designated by the path `P` the
- * new domain `TNew`. Encodes the three `Update` rules of appendix B.
- *
- * The recursive rules descend into the nesting with `LookupFlat`, update
- * the sub-schema, then write it back with `UpdateFlat`. As in `Lookup`, the
- * collection case is demoted to a low-priority trait.
- */
+/** Schema with the attribute at path `P` given the domain `TNew` (appendix B, `Update`). */
 @implicitNotFound(
   "PolyFrames: the path ${P} cannot be followed in the schema\n    ${S}"
 )
@@ -58,18 +45,16 @@ object Update extends LowPriorityUpdate {
   type Aux[S <: HList, P <: HList, TNew, O <: HList] =
     Update[S, P, TNew] { type Out = O }
 
-  /** Path of length one: delegate to `UpdateFlat`. */
   implicit def onLast[S <: HList, K, TNew, NS <: HList](
       implicit flat: UpdateFlat.Aux[S, K, TNew, NS]
   ): Aux[S, K :: HNil, TNew, NS] =
     new Update[S, K :: HNil, TNew] { type Out = NS }
 
-  /** Longer path, head key leading to a nested schema. */
   implicit def onNestedObject[
       S <: HList, K, P <: HList, TNew,
       Sub <: HList, NSub <: HList, NS <: HList
   ](
-      implicit 
+      implicit
       flat: LookupFlat.Aux[S, K, Sub],
       inner: Aux[Sub, P, TNew, NSub],
       back: UpdateFlat.Aux[S, K, NSub, NS]
@@ -79,12 +64,11 @@ object Update extends LowPriorityUpdate {
 
 trait LowPriorityUpdate {
 
-  /** Longer path, head key leading to a collection of nested schemas. */
   implicit def onNestedList[
       S <: HList, K, P <: HList, TNew,
       L, Sub <: HList, NSub <: HList, NS <: HList
   ](
-      implicit 
+      implicit
       flat: LookupFlat.Aux[S, K, L],
       list: ListOfSchema.Aux[L, Sub],
       inner: Update.Aux[Sub, P, TNew, NSub],
