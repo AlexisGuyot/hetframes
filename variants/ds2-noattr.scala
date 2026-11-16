@@ -1,9 +1,9 @@
-package polyframes.variants
+package hetframes.variants
 
 import org.apache.spark.sql.{Encoders, SparkSession}
-import polyframes.bench.P1Dataset.{Nutriments, Product}
-import polyframes.bench.P2Dataset._
-import polyframes.bench.Sink
+import hetframes.bench.P1Dataset.{Nutriments, Product}
+import hetframes.bench.P2Dataset._
+import hetframes.bench.Sink
 
 /**
  * Datasets, an attribute absent from the schema, on the pipeline that

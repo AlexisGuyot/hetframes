@@ -1,23 +1,23 @@
 experiment,subject,baseline,family,volume,width,metric,value,note
-width,width-5,polyframes,none,,5,compile-ms,137,median of 5 interleaved rounds
-width,width-10,polyframes,none,,10,compile-ms,194,median of 5 interleaved rounds
-width,width-20,polyframes,none,,20,compile-ms,415,median of 5 interleaved rounds
-width,width-40,polyframes,none,,40,compile-ms,1614,median of 5 interleaved rounds
-width,width-80,polyframes,none,,80,compile-ms,11158,median of 5 interleaved rounds
-error-prevention,p1,polyframes,none,,,compiles,true,
-error-prevention,p1,polyframes,none,,,compile-ms,326,median of 5 interleaved rounds
+width,width-5,hetframes,none,,5,compile-ms,137,median of 5 interleaved rounds
+width,width-10,hetframes,none,,10,compile-ms,194,median of 5 interleaved rounds
+width,width-20,hetframes,none,,20,compile-ms,415,median of 5 interleaved rounds
+width,width-40,hetframes,none,,40,compile-ms,1614,median of 5 interleaved rounds
+width,width-80,hetframes,none,,80,compile-ms,11158,median of 5 interleaved rounds
+error-prevention,p1,hetframes,none,,,compiles,true,
+error-prevention,p1,hetframes,none,,,compile-ms,326,median of 5 interleaved rounds
 error-prevention,p1-dataframe,dataframe,none,,,compiles,true,
 error-prevention,p1-dataframe,dataframe,none,,,compile-ms,89,median of 5 interleaved rounds
 error-prevention,p1-dataset,dataset,none,,,compiles,true,
 error-prevention,p1-dataset,dataset,none,,,compile-ms,227,median of 5 interleaved rounds
-error-prevention,pf-noattr,polyframes,noattr,,,compiles,false,"could not find implicit value for parameter reduce: polyframes.infer.Project.Aux[shapeless.labelled.FieldType[String(""code""),String] :: shapeless.labelled.FieldType[String(""product_type""),String] :: shapeless.labelled.FieldType[String(""nutriscore_grade""),String] :: shapeless.labelled.FieldType[String(""pnns_groups_1""),String] :: shapeless.labelled.FieldType[String(""completeness""),Double] :: shapeless.labelled.FieldType[String(""countries_tags""),List[String]] :: shapeless.labelled.FieldType[""nutriments"",shapeless.labelled.FieldType[String(""energy-kcal_100g""),Double] :: shapeless.labelled.FieldType[String(""fat_100g""),Double] :: shapeless.labelled.FieldType[String(""carbohydrates_100g""),Double] :: shapeless.labelled.FieldType[String(""proteins""),Double] :: shapeless.labelled.FieldType[String(""salt""),Double] :: shapeless.labelled.FieldType[""carb_share"",Double] :: shapeless.HNil] :: shapeless.labelled.FieldType[""is_beverage"",Boolean] :: shapeless.HNil,(""cod"" :: shapeless.HNil) :: (""nutriscore_grade"" :: shapeless.HNil) :: shapeless.HNil,NS] (PolyFrames: the paths (""cod"" :: shapeless.HNil) :: (""nutriscore_grade"" :: shapeless.HNil) :: shapeless.HNil cannot be projected from the schema"
-error-prevention,pf-noattr,polyframes,noattr,,,compile-ms,236,median of 5 interleaved rounds
-error-prevention,pf-badtype,polyframes,badtype,,,compiles,false,type mismatch;
-error-prevention,pf-badtype,polyframes,badtype,,,compile-ms,291,median of 5 interleaved rounds
-error-prevention,pf-badmodel,polyframes,badmodel,,,compiles,false,type mismatch;
-error-prevention,pf-badmodel,polyframes,badmodel,,,compile-ms,275,median of 5 interleaved rounds
-error-prevention,pf-badtransfo,polyframes,badtransfo,,,compiles,false,PolyFrames: the schema
-error-prevention,pf-badtransfo,polyframes,badtransfo,,,compile-ms,271,median of 5 interleaved rounds
+error-prevention,hf-noattr,hetframes,noattr,,,compiles,false,"could not find implicit value for parameter reduce: hetframes.infer.Project.Aux[shapeless.labelled.FieldType[String(""code""),String] :: shapeless.labelled.FieldType[String(""product_type""),String] :: shapeless.labelled.FieldType[String(""nutriscore_grade""),String] :: shapeless.labelled.FieldType[String(""pnns_groups_1""),String] :: shapeless.labelled.FieldType[String(""completeness""),Double] :: shapeless.labelled.FieldType[String(""countries_tags""),List[String]] :: shapeless.labelled.FieldType[""nutriments"",shapeless.labelled.FieldType[String(""energy-kcal_100g""),Double] :: shapeless.labelled.FieldType[String(""fat_100g""),Double] :: shapeless.labelled.FieldType[String(""carbohydrates_100g""),Double] :: shapeless.labelled.FieldType[String(""proteins""),Double] :: shapeless.labelled.FieldType[String(""salt""),Double] :: shapeless.labelled.FieldType[""carb_share"",Double] :: shapeless.HNil] :: shapeless.labelled.FieldType[""is_beverage"",Boolean] :: shapeless.HNil,(""cod"" :: shapeless.HNil) :: (""nutriscore_grade"" :: shapeless.HNil) :: shapeless.HNil,NS] (HetFrames: the paths (""cod"" :: shapeless.HNil) :: (""nutriscore_grade"" :: shapeless.HNil) :: shapeless.HNil cannot be projected from the schema"
+error-prevention,hf-noattr,hetframes,noattr,,,compile-ms,236,median of 5 interleaved rounds
+error-prevention,hf-badtype,hetframes,badtype,,,compiles,false,type mismatch;
+error-prevention,hf-badtype,hetframes,badtype,,,compile-ms,291,median of 5 interleaved rounds
+error-prevention,hf-badmodel,hetframes,badmodel,,,compiles,false,type mismatch;
+error-prevention,hf-badmodel,hetframes,badmodel,,,compile-ms,275,median of 5 interleaved rounds
+error-prevention,hf-badtransfo,hetframes,badtransfo,,,compiles,false,HetFrames: the schema
+error-prevention,hf-badtransfo,hetframes,badtransfo,,,compile-ms,271,median of 5 interleaved rounds
 error-prevention,df-noattr,dataframe,noattr,,,compiles,true,
 error-prevention,df-noattr,dataframe,noattr,,,compile-ms,93,median of 5 interleaved rounds
 error-prevention,df-badtype,dataframe,badtype,,,compiles,true,
@@ -26,7 +26,7 @@ error-prevention,df-badmodel,dataframe,badmodel,,,compiles,true,
 error-prevention,df-badmodel,dataframe,badmodel,,,compile-ms,80,median of 5 interleaved rounds
 error-prevention,df-badtransfo,dataframe,badtransfo,,,compiles,true,
 error-prevention,df-badtransfo,dataframe,badtransfo,,,compile-ms,75,median of 5 interleaved rounds
-error-prevention,ds-noattr,dataset,noattr,,,compiles,false,value cod is not a member of polyframes.bench.P1Dataset.ProductBeverage
+error-prevention,ds-noattr,dataset,noattr,,,compiles,false,value cod is not a member of hetframes.bench.P1Dataset.ProductBeverage
 error-prevention,ds-noattr,dataset,noattr,,,compile-ms,89,median of 5 interleaved rounds
 error-prevention,ds-badtype,dataset,badtype,,,compiles,false,type mismatch;
 error-prevention,ds-badtype,dataset,badtype,,,compile-ms,107,median of 5 interleaved rounds
@@ -34,20 +34,20 @@ error-prevention,ds-badmodel,dataset,badmodel,,,compiles,true,
 error-prevention,ds-badmodel,dataset,badmodel,,,compile-ms,117,median of 5 interleaved rounds
 error-prevention,ds-badtransfo,dataset,badtransfo,,,compiles,true,
 error-prevention,ds-badtransfo,dataset,badtransfo,,,compile-ms,138,median of 5 interleaved rounds
-error-prevention,p2,polyframes,none,,,compiles,true,
-error-prevention,p2,polyframes,none,,,compile-ms,545,median of 5 interleaved rounds
+error-prevention,p2,hetframes,none,,,compiles,true,
+error-prevention,p2,hetframes,none,,,compile-ms,545,median of 5 interleaved rounds
 error-prevention,p2-dataframe,dataframe,none,,,compiles,true,
 error-prevention,p2-dataframe,dataframe,none,,,compile-ms,94,median of 5 interleaved rounds
 error-prevention,p2-dataset,dataset,none,,,compiles,true,
 error-prevention,p2-dataset,dataset,none,,,compile-ms,264,median of 5 interleaved rounds
-error-prevention,pf2-noattr,polyframes,noattr,,,compiles,false,"could not find implicit value for parameter reduce: polyframes.infer.Project.Aux[shapeless.labelled.FieldType[String(""grade_code""),String] :: shapeless.labelled.FieldType[String(""grade_label""),String] :: shapeless.labelled.FieldType[""grade_rank"",Double] :: shapeless.labelled.FieldType[""barcode"",String] :: shapeless.labelled.FieldType[String(""product_type""),String] :: shapeless.labelled.FieldType[String(""nutriscore_grade""),String] :: shapeless.labelled.FieldType[String(""pnns_groups_1""),String] :: shapeless.labelled.FieldType[String(""completeness""),Double] :: shapeless.labelled.FieldType[String(""countries_tags""),List[String]] :: shapeless.labelled.FieldType[""nutriments"",shapeless.labelled.FieldType[String(""energy-kcal_100g""),Double] :: shapeless.labelled.FieldType[String(""fat_100g""),Double] :: shapeless.labelled.FieldType[String(""carbohydrates_100g""),Double] :: shapeless.labelled.FieldType[String(""proteins""),Double] :: shapeless.labelled.FieldType[""carb_share"",Double] :: shapeless.HNil] :: shapeless.labelled.FieldType[""well_rated"",Boolean] :: shapeless.HNil,(""barcode"" :: shapeless.HNil) :: (""grade_labell"" :: shapeless.HNil) :: shapeless.HNil,NS] (PolyFrames: the paths (""barcode"" :: shapeless.HNil) :: (""grade_labell"" :: shapeless.HNil) :: shapeless.HNil cannot be projected from the schema"
-error-prevention,pf2-noattr,polyframes,noattr,,,compile-ms,460,median of 5 interleaved rounds
-error-prevention,pf2-badtype,polyframes,badtype,,,compiles,false,type mismatch;
-error-prevention,pf2-badtype,polyframes,badtype,,,compile-ms,386,median of 5 interleaved rounds
-error-prevention,pf2-badmodel,polyframes,badmodel,,,compiles,false,type mismatch;
-error-prevention,pf2-badmodel,polyframes,badmodel,,,compile-ms,446,median of 5 interleaved rounds
-error-prevention,pf2-badtransfo,polyframes,badtransfo,,,compiles,false,PolyFrames: the schema
-error-prevention,pf2-badtransfo,polyframes,badtransfo,,,compile-ms,394,median of 5 interleaved rounds
+error-prevention,hf2-noattr,hetframes,noattr,,,compiles,false,"could not find implicit value for parameter reduce: hetframes.infer.Project.Aux[shapeless.labelled.FieldType[String(""grade_code""),String] :: shapeless.labelled.FieldType[String(""grade_label""),String] :: shapeless.labelled.FieldType[""grade_rank"",Double] :: shapeless.labelled.FieldType[""barcode"",String] :: shapeless.labelled.FieldType[String(""product_type""),String] :: shapeless.labelled.FieldType[String(""nutriscore_grade""),String] :: shapeless.labelled.FieldType[String(""pnns_groups_1""),String] :: shapeless.labelled.FieldType[String(""completeness""),Double] :: shapeless.labelled.FieldType[String(""countries_tags""),List[String]] :: shapeless.labelled.FieldType[""nutriments"",shapeless.labelled.FieldType[String(""energy-kcal_100g""),Double] :: shapeless.labelled.FieldType[String(""fat_100g""),Double] :: shapeless.labelled.FieldType[String(""carbohydrates_100g""),Double] :: shapeless.labelled.FieldType[String(""proteins""),Double] :: shapeless.labelled.FieldType[""carb_share"",Double] :: shapeless.HNil] :: shapeless.labelled.FieldType[""well_rated"",Boolean] :: shapeless.HNil,(""barcode"" :: shapeless.HNil) :: (""grade_labell"" :: shapeless.HNil) :: shapeless.HNil,NS] (HetFrames: the paths (""barcode"" :: shapeless.HNil) :: (""grade_labell"" :: shapeless.HNil) :: shapeless.HNil cannot be projected from the schema"
+error-prevention,hf2-noattr,hetframes,noattr,,,compile-ms,460,median of 5 interleaved rounds
+error-prevention,hf2-badtype,hetframes,badtype,,,compiles,false,type mismatch;
+error-prevention,hf2-badtype,hetframes,badtype,,,compile-ms,386,median of 5 interleaved rounds
+error-prevention,hf2-badmodel,hetframes,badmodel,,,compiles,false,type mismatch;
+error-prevention,hf2-badmodel,hetframes,badmodel,,,compile-ms,446,median of 5 interleaved rounds
+error-prevention,hf2-badtransfo,hetframes,badtransfo,,,compiles,false,HetFrames: the schema
+error-prevention,hf2-badtransfo,hetframes,badtransfo,,,compile-ms,394,median of 5 interleaved rounds
 error-prevention,df2-noattr,dataframe,noattr,,,compiles,true,
 error-prevention,df2-noattr,dataframe,noattr,,,compile-ms,78,median of 5 interleaved rounds
 error-prevention,df2-badtype,dataframe,badtype,,,compiles,true,
@@ -56,7 +56,7 @@ error-prevention,df2-badmodel,dataframe,badmodel,,,compiles,true,
 error-prevention,df2-badmodel,dataframe,badmodel,,,compile-ms,74,median of 5 interleaved rounds
 error-prevention,df2-badtransfo,dataframe,badtransfo,,,compiles,true,
 error-prevention,df2-badtransfo,dataframe,badtransfo,,,compile-ms,72,median of 5 interleaved rounds
-error-prevention,ds2-noattr,dataset,noattr,,,compiles,false,value grade_labell is not a member of polyframes.bench.P2Dataset.Rated
+error-prevention,ds2-noattr,dataset,noattr,,,compiles,false,value grade_labell is not a member of hetframes.bench.P2Dataset.Rated
 error-prevention,ds2-noattr,dataset,noattr,,,compile-ms,96,median of 5 interleaved rounds
 error-prevention,ds2-badtype,dataset,badtype,,,compiles,false,type mismatch;
 error-prevention,ds2-badtype,dataset,badtype,,,compile-ms,100,median of 5 interleaved rounds
@@ -76,62 +76,62 @@ error-prevention,df2-badmodel,dataframe,badmodel,,,runs,false,"AnalysisException
 error-prevention,df2-badtransfo,dataframe,badtransfo,,,runs,false,"AnalysisException: [UNSUPPORTED_DATA_TYPE_FOR_DATASOURCE] The CSV datasource doesn't support the column `nutriments` of the type ""STRUCT<carb_share: DOUBLE>"". SQLSTATE: 0A000"
 error-prevention,ds2-badmodel,dataset,badmodel,,,runs,false,"AnalysisException: [UNSUPPORTED_DATA_TYPE_FOR_DATASOURCE] The CSV datasource doesn't support the column `countries_tags` of the type ""ARRAY<STRING>"". SQLSTATE: 0A000"
 error-prevention,ds2-badtransfo,dataset,badtransfo,,,runs,false,"AnalysisException: [UNSUPPORTED_DATA_TYPE_FOR_DATASOURCE] The CSV datasource doesn't support the column `nutriments` of the type ""STRUCT<carb_share: DOUBLE NOT NULL>"". SQLSTATE: 0A000"
-volume,p1,polyframes,none,10000,,run-ms,566,median of 5 interleaved rounds
-volume,p1,polyframes,none,10000,,heap-mb,239,peak sampled every 50 ms
+volume,p1,hetframes,none,10000,,run-ms,566,median of 5 interleaved rounds
+volume,p1,hetframes,none,10000,,heap-mb,239,peak sampled every 50 ms
 volume,p1-dataframe,dataframe,none,10000,,run-ms,510,median of 5 interleaved rounds
 volume,p1-dataframe,dataframe,none,10000,,heap-mb,276,peak sampled every 50 ms
 volume,p1-dataset,dataset,none,10000,,run-ms,548,median of 5 interleaved rounds
 volume,p1-dataset,dataset,none,10000,,heap-mb,237,peak sampled every 50 ms
-volume,p2,polyframes,none,10000,,run-ms,650,median of 5 interleaved rounds
-volume,p2,polyframes,none,10000,,heap-mb,298,peak sampled every 50 ms
+volume,p2,hetframes,none,10000,,run-ms,650,median of 5 interleaved rounds
+volume,p2,hetframes,none,10000,,heap-mb,298,peak sampled every 50 ms
 volume,p2-dataframe,dataframe,none,10000,,run-ms,625,median of 5 interleaved rounds
 volume,p2-dataframe,dataframe,none,10000,,heap-mb,254,peak sampled every 50 ms
 volume,p2-dataset,dataset,none,10000,,run-ms,668,median of 5 interleaved rounds
 volume,p2-dataset,dataset,none,10000,,heap-mb,296,peak sampled every 50 ms
-volume,p1,polyframes,none,50000,,run-ms,1147,median of 5 interleaved rounds
-volume,p1,polyframes,none,50000,,heap-mb,425,peak sampled every 50 ms
+volume,p1,hetframes,none,50000,,run-ms,1147,median of 5 interleaved rounds
+volume,p1,hetframes,none,50000,,heap-mb,425,peak sampled every 50 ms
 volume,p1-dataframe,dataframe,none,50000,,run-ms,1071,median of 5 interleaved rounds
 volume,p1-dataframe,dataframe,none,50000,,heap-mb,452,peak sampled every 50 ms
 volume,p1-dataset,dataset,none,50000,,run-ms,1241,median of 5 interleaved rounds
 volume,p1-dataset,dataset,none,50000,,heap-mb,741,peak sampled every 50 ms
-volume,p2,polyframes,none,50000,,run-ms,1278,median of 5 interleaved rounds
-volume,p2,polyframes,none,50000,,heap-mb,484,peak sampled every 50 ms
+volume,p2,hetframes,none,50000,,run-ms,1278,median of 5 interleaved rounds
+volume,p2,hetframes,none,50000,,heap-mb,484,peak sampled every 50 ms
 volume,p2-dataframe,dataframe,none,50000,,run-ms,1049,median of 5 interleaved rounds
 volume,p2-dataframe,dataframe,none,50000,,heap-mb,456,peak sampled every 50 ms
 volume,p2-dataset,dataset,none,50000,,run-ms,1060,median of 5 interleaved rounds
 volume,p2-dataset,dataset,none,50000,,heap-mb,782,peak sampled every 50 ms
-volume,p1,polyframes,none,100000,,run-ms,2635,median of 5 interleaved rounds
-volume,p1,polyframes,none,100000,,heap-mb,915,peak sampled every 50 ms
+volume,p1,hetframes,none,100000,,run-ms,2635,median of 5 interleaved rounds
+volume,p1,hetframes,none,100000,,heap-mb,915,peak sampled every 50 ms
 volume,p1-dataframe,dataframe,none,100000,,run-ms,2594,median of 5 interleaved rounds
 volume,p1-dataframe,dataframe,none,100000,,heap-mb,623,peak sampled every 50 ms
 volume,p1-dataset,dataset,none,100000,,run-ms,2623,median of 5 interleaved rounds
 volume,p1-dataset,dataset,none,100000,,heap-mb,1007,peak sampled every 50 ms
-volume,p2,polyframes,none,100000,,run-ms,2787,median of 5 interleaved rounds
-volume,p2,polyframes,none,100000,,heap-mb,697,peak sampled every 50 ms
+volume,p2,hetframes,none,100000,,run-ms,2787,median of 5 interleaved rounds
+volume,p2,hetframes,none,100000,,heap-mb,697,peak sampled every 50 ms
 volume,p2-dataframe,dataframe,none,100000,,run-ms,2571,median of 5 interleaved rounds
 volume,p2-dataframe,dataframe,none,100000,,heap-mb,699,peak sampled every 50 ms
 volume,p2-dataset,dataset,none,100000,,run-ms,2779,median of 5 interleaved rounds
 volume,p2-dataset,dataset,none,100000,,heap-mb,631,peak sampled every 50 ms
-volume,p1,polyframes,none,250000,,run-ms,6125,median of 5 interleaved rounds
-volume,p1,polyframes,none,250000,,heap-mb,1112,peak sampled every 50 ms
+volume,p1,hetframes,none,250000,,run-ms,6125,median of 5 interleaved rounds
+volume,p1,hetframes,none,250000,,heap-mb,1112,peak sampled every 50 ms
 volume,p1-dataframe,dataframe,none,250000,,run-ms,5955,median of 5 interleaved rounds
 volume,p1-dataframe,dataframe,none,250000,,heap-mb,773,peak sampled every 50 ms
 volume,p1-dataset,dataset,none,250000,,run-ms,6105,median of 5 interleaved rounds
 volume,p1-dataset,dataset,none,250000,,heap-mb,1022,peak sampled every 50 ms
-volume,p2,polyframes,none,250000,,run-ms,6072,median of 5 interleaved rounds
-volume,p2,polyframes,none,250000,,heap-mb,1093,peak sampled every 50 ms
+volume,p2,hetframes,none,250000,,run-ms,6072,median of 5 interleaved rounds
+volume,p2,hetframes,none,250000,,heap-mb,1093,peak sampled every 50 ms
 volume,p2-dataframe,dataframe,none,250000,,run-ms,5783,median of 5 interleaved rounds
 volume,p2-dataframe,dataframe,none,250000,,heap-mb,864,peak sampled every 50 ms
 volume,p2-dataset,dataset,none,250000,,run-ms,6095,median of 5 interleaved rounds
 volume,p2-dataset,dataset,none,250000,,heap-mb,1015,peak sampled every 50 ms
-volume,p1,polyframes,none,500000,,run-ms,14642,median of 5 interleaved rounds
-volume,p1,polyframes,none,500000,,heap-mb,933,peak sampled every 50 ms
+volume,p1,hetframes,none,500000,,run-ms,14642,median of 5 interleaved rounds
+volume,p1,hetframes,none,500000,,heap-mb,933,peak sampled every 50 ms
 volume,p1-dataframe,dataframe,none,500000,,run-ms,13769,median of 5 interleaved rounds
 volume,p1-dataframe,dataframe,none,500000,,heap-mb,934,peak sampled every 50 ms
 volume,p1-dataset,dataset,none,500000,,run-ms,13583,median of 5 interleaved rounds
 volume,p1-dataset,dataset,none,500000,,heap-mb,963,peak sampled every 50 ms
-volume,p2,polyframes,none,500000,,run-ms,16001,median of 5 interleaved rounds
-volume,p2,polyframes,none,500000,,heap-mb,1061,peak sampled every 50 ms
+volume,p2,hetframes,none,500000,,run-ms,16001,median of 5 interleaved rounds
+volume,p2,hetframes,none,500000,,heap-mb,1061,peak sampled every 50 ms
 volume,p2-dataframe,dataframe,none,500000,,run-ms,16508,median of 5 interleaved rounds
 volume,p2-dataframe,dataframe,none,500000,,heap-mb,1021,peak sampled every 50 ms
 volume,p2-dataset,dataset,none,500000,,run-ms,14473,median of 5 interleaved rounds

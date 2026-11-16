@@ -1,8 +1,8 @@
-package polyframes.variants
+package hetframes.variants
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import polyframes.bench.{P1DataFrame, P2DataFrame, Sink}
+import hetframes.bench.{P1DataFrame, P2DataFrame, Sink}
 
 /**
  * DataFrames, a transformation breaking the model the data is assumed

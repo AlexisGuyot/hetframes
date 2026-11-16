@@ -1,10 +1,10 @@
-package polyframes.variants
+package hetframes.variants
 
 import org.apache.spark.sql.SparkSession
-import polyframes.bench.Schemas._
-import polyframes.bench.Loader
-import polyframes.ops.Ops._
-import polyframes.types.Document
+import hetframes.bench.Schemas._
+import hetframes.bench.Loader
+import hetframes.ops.Ops._
+import hetframes.types.Document
 import shapeless.{::, HNil}
 
 /**

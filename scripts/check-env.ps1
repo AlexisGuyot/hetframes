@@ -1,4 +1,4 @@
-# Checks that the tools PolyFrames needs are installed on Windows, and that
+# Checks that the tools HetFrames needs are installed on Windows, and that
 # the machine is configured so that compilation timings are meaningful.
 # Run from PowerShell:  .\scripts\check-env.ps1
 
@@ -50,7 +50,7 @@ $cpu = Get-CimInstance Win32_Processor | Select-Object -First 1
 "workdir   $(Get-Location)"
 if ("$(Get-Location)".Contains(" ")) {
     "          ^ this path contains a space. Spark does not handle those well."
-    "            Move the project somewhere like C:\dev\polyframes."
+    "            Move the project somewhere like C:\dev\hetframes."
     $status = 1
 }
 

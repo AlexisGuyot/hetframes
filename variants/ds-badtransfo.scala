@@ -1,9 +1,9 @@
-package polyframes.variants
+package hetframes.variants
 
 import org.apache.spark.sql.{Encoders, SparkSession}
-import polyframes.bench.P1Dataset._
-import polyframes.bench.Sink
-import polyframes.bench.VariantClasses.NotFlatP1
+import hetframes.bench.P1Dataset._
+import hetframes.bench.Sink
+import hetframes.bench.VariantClasses.NotFlatP1
 
 /**
  * Datasets, a transformation breaking the model the data is assumed to

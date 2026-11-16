@@ -1,8 +1,8 @@
-# PolyFrames
+# HetFrames
 
 Companion proof of concept for the article *Leveraging Types to Improve the Robustness of Analytical Pipelines in Schema-on-Read Systems*.
 
-PolyFrames is a typed layer over SparkSQL `DataFrame`s. It encodes the schema and the logical model of data in types, and infers how both evolve along a pipeline, so that a compiler rejects transformations and compositions that would otherwise fail at run time.
+HetFrames is a typed layer over SparkSQL `DataFrame`s. It encodes the schema and the logical model of data in types, and infers how both evolve along a pipeline, so that a compiler rejects transformations and compositions that would otherwise fail at run time.
 
 It is a proof of concept, not a general-purpose library (yet). Its kernel implements the rules of the article and nothing beyond them.
 
@@ -10,16 +10,16 @@ It is a proof of concept, not a general-purpose library (yet). Its kernel implem
 
 ## Reproducing the experiments
 
-PolyFrames runs on Windows, Linux and macOS. The measurement itself is a single command, identical everywhere:
+HetFrames runs on Windows, Linux and macOS. The measurement itself is a single command, identical everywhere:
 
 ```
-sbt "bench/runMain polyframes.bench.FetchData"
+sbt "bench/runMain hetframes.bench.FetchData"
 sbt experiments
 ```
 
 The first extracts the dataset subset; the second compiles every pipeline variant, runs the measured pipelines, and writes `results.csv` and `RESULTS.md`, with the number of rounds the article reports (five, after an unmeasured one). Expect it to take a few minutes on the reference machine described below.
 
-The tests of the library are in `core/src/test`. Two are checked by the compiler alone, so `sbt Test/compile` runs them: `TypeSpec` (what must compile, with the expected schemas) and `NegativeSpec` (what must not, with `illTyped`). Two are programs, run by hand: `sbt "core/Test/runMain polyframes.RuntimeSpec"` (the binding to SparkSQL, piece by piece) and `sbt "core/Test/runMain polyframes.OpsSpec"` (the six operators end to end).
+The tests of the library are in `core/src/test`. Two are checked by the compiler alone, so `sbt Test/compile` runs them: `TypeSpec` (what must compile, with the expected schemas) and `NegativeSpec` (what must not, with `illTyped`). Two are programs, run by hand: `sbt "core/Test/runMain hetframes.RuntimeSpec"` (the binding to SparkSQL, piece by piece) and `sbt "core/Test/runMain hetframes.OpsSpec"` (the six operators end to end).
 
 ### Setup, once
 
@@ -32,25 +32,25 @@ Common to every platform: a JDK 17 or 21 (Spark 4 supports neither Java 8 nor Ja
 1. create `C:\hadoop\bin`;
 2. place `winutils.exe` and `hadoop.dll` for Hadoop 3.4.x in it;
 3. set `HADOOP_HOME` to `C:\hadoop` and add `%HADOOP_HOME%\bin` to `PATH`;
-4. keep the project at a short path without spaces, such as `C:\dev\polyframes`;
+4. keep the project at a short path without spaces, such as `C:\dev\hetframes`;
 5. exclude the project folder and the `.sbt`, `.ivy2` and `coursier` caches from real-time antivirus scanning. This is not cosmetic: scanning the build    caches inflates and destabilises compilation times, which are one of the three measurements reported.
 
-The pipelines write their results to a fresh directory under the system temporary folder rather than to a fixed path inside the repository. Spark creates many short-lived directories there, in parallel; if real-time scanning gets in the way (intermittent `IOException: Mkdirs failed to create ...`), either exclude that folder too, or point the runs to a folder already excluded, e.g. `set POLYFRAMES_OUT=C:\dev\polyframes-out` before launching sbt.
+The pipelines write their results to a fresh directory under the system temporary folder rather than to a fixed path inside the repository. Spark creates many short-lived directories there, in parallel; if real-time scanning gets in the way (intermittent `IOException: Mkdirs failed to create ...`), either exclude that folder too, or point the runs to a folder already excluded, e.g. `set HETFRAMES_OUT=C:\dev\hetframes-out` before launching sbt.
 
 Run `.\scripts\check-env.ps1` to confirm all five.
 
 ### The pipeline variants
 
-Each of the two pipelines of the article, P1 and P2, is written three ways: with PolyFrames, with plain `DataFrame`s and with `Dataset`s. The six correct versions live in the source tree of the harness (`bench/src/main/scala/polyframes/bench/P1.scala`, `P1DataFrame.scala`, `P1Dataset.scala`, and the same three for P2).
+Each of the two pipelines of the article, P1 and P2, is written three ways: with HetFrames, with plain `DataFrame`s and with `Dataset`s. The six correct versions live in the source tree of the harness (`bench/src/main/scala/hetframes/bench/P1.scala`, `P1DataFrame.scala`, `P1Dataset.scala`, and the same three for P2).
 
 The four families of data engineering errors the article prevents are then injected into each of the six. Some of the resulting variants are meant not to compile, so they live under `variants/` rather than in the source tree, and each is compiled in isolation, so that a variant failing to compile does not stop the others.
 
 ```
 variants/
-  pf-*.scala      P1 written with PolyFrames
+  hf-*.scala      P1 written with HetFrames
   df-*.scala      P1 written with DataFrames
   ds-*.scala      P1 written with Datasets
-  pf2-*.scala     P2, same three prefixes with a 2
+  hf2-*.scala     P2, same three prefixes with a 2
   df2-*.scala
   ds2-*.scala
   width-N.scala   a declaration of N attributes, for the compilation-time axis
@@ -66,7 +66,7 @@ variants/
 To try one variant by hand, without timing anything or writing to `results.csv`:
 
 ```
-sbt "bench/runMain polyframes.bench.CompileVariant variants/pf-noattr.scala"
+sbt "bench/runMain hetframes.bench.CompileVariant variants/hf-noattr.scala"
 ```
 
 The compiler message it prints is the guarantee, in the form a user sees it.
@@ -95,7 +95,7 @@ VARIANTS.md  the erroneous variants side by side, with their outcomes
 
 ## Citing
 
-If you use PolyFrames, please cite it through the metadata in `CITATION.cff` (GitHub offers them under "Cite this repository"). Every release is archived on Zenodo : https://doi.org/10.5281/zenodo.22875856.
+If you use HetFrames, please cite it through the metadata in `CITATION.cff` (GitHub offers them under "Cite this repository"). Every release is archived on Zenodo : https://doi.org/10.5281/zenodo.22875856.
 
 ## Licence
 

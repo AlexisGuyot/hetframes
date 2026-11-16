@@ -14,7 +14,7 @@ Data from Open Food Facts, licensed under the Open Database License (ODbL).
 
 ## What is extracted
 
-`polyframes.bench.FetchData` streams the current dump, keeps the first N products, and writes one JSONL file per volume point under `data/`, at the root of the repository. Each file is a prefix of the next. It records in `data/PROVENANCE.txt` the URL, the licence, the `Last-Modified` header of the dump, the date of retrieval and the number of products kept.
+`hetframes.bench.FetchData` streams the current dump, keeps the first N products, and writes one JSONL file per volume point under `data/`, at the root of the repository. Each file is a prefix of the next. It records in `data/PROVENANCE.txt` the URL, the licence, the `Last-Modified` header of the dump, the date of retrieval and the number of products kept.
 
 Open Food Facts publishes only its latest export. Running `FetchData` again therefore extracts a different sample, and the figures it leads to will differ from those of the article, which were measured on the dump whose date `data/PROVENANCE.txt` records. The extracted files are not redistributed with the code; only `data/PROVENANCE.txt` is versioned.
 

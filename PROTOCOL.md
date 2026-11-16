@@ -6,7 +6,7 @@ alongside `results.csv`, which holds every figure the article reports, and `RESU
 Reproducing everything:
 
 ```
-sbt "bench/runMain polyframes.bench.FetchData"
+sbt "bench/runMain hetframes.bench.FetchData"
 sbt experiments
 ```
 

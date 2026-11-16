@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Checks that the tools PolyFrames needs are installed, and that none of
+# Checks that the tools HetFrames needs are installed, and that none of
 # them is a Windows executable reached through a WSL mount. Run this first.
 set -u
 

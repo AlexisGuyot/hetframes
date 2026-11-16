@@ -1,13 +1,13 @@
-package polyframes.variants
+package hetframes.variants
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import polyframes.bench.{P1DataFrame, Sink}
+import hetframes.bench.{P1DataFrame, Sink}
 
 /**
  * DataFrames, an attribute of an unexpected domain.
  *
- * Same injection as pf-badtype and ds-badtype: carb_share is created as a
+ * Same injection as hf-badtype and ds-badtype: carb_share is created as a
  * string at step 1 and read as a number at step 4.
  *
  * Expected: compiles; fails when the query is analysed, at run time.

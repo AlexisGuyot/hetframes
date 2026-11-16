@@ -1,11 +1,11 @@
 // =====================================================================
-// PolyFrames - companion proof of concept for
+// HetFrames - companion proof of concept for
 // "Leveraging Types to Improve the Robustness of Analytical Pipelines
 //  in Schema-on-Read Systems"
 // =====================================================================
 
 ThisBuild / scalaVersion := "2.13.16"     
-ThisBuild / organization := "org.polyframes"
+ThisBuild / organization := "org.hetframes"
 ThisBuild / version      := "0.1.0"
 
 lazy val sparkVersion     = "4.0.1"       
@@ -48,7 +48,7 @@ ThisBuild / javaOptions += "-Xmx8g"
 // ---------------------------------------------------------------------
 lazy val core = (project in file("core"))
   .settings(
-    name := "polyframes",
+    name := "hetframes",
     libraryDependencies ++= Seq(
       "com.chuusai"      %% "shapeless"  % shapelessVersion,
       "org.apache.spark" %% "spark-core" % sparkVersion,
@@ -63,7 +63,7 @@ lazy val core = (project in file("core"))
 lazy val bench = (project in file("bench"))
   .dependsOn(core)
   .settings(
-    name := "polyframes-bench",
+    name := "hetframes-bench",
     libraryDependencies ++= Seq(
       "org.apache.spark" %% "spark-core" % sparkVersion,
       "org.apache.spark" %% "spark-sql"  % sparkVersion,
@@ -73,11 +73,11 @@ lazy val bench = (project in file("bench"))
 
 lazy val root = (project in file("."))
   .aggregate(core, bench)
-  .settings(name := "polyframes-root", publish / skip := true)
+  .settings(name := "hetframes-root", publish / skip := true)
 
 // Four programs, four JVMs
 addCommandAlias("experiments",
-  ";bench/runMain polyframes.bench.CompileWidth" +
-  ";bench/runMain polyframes.bench.CompileVariants" +
-  ";bench/runMain polyframes.bench.RunExperiments" +
-  ";bench/runMain polyframes.bench.Report")
+  ";bench/runMain hetframes.bench.CompileWidth" +
+  ";bench/runMain hetframes.bench.CompileVariants" +
+  ";bench/runMain hetframes.bench.RunExperiments" +
+  ";bench/runMain hetframes.bench.Report")

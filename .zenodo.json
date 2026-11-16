@@ -1,7 +1,7 @@
 {
-  "title": "PolyFrames: companion code for \"Leveraging Types to Improve the Robustness of Analytical Pipelines in Schema-on-Read Systems\"",
+  "title": "HetFrames: companion code for \"Leveraging Types to Improve the Robustness of Analytical Pipelines in Schema-on-Read Systems\"",
   "upload_type": "software",
-  "description": "<p>PolyFrames is a typed layer over SparkSQL DataFrames. It encodes the schema and the logical model of data in types, and infers how both evolve along a pipeline, so that a compiler rejects transformations and compositions that would otherwise fail at run time.</p><p>It is a proof of concept whose kernel implements the rules of the article and nothing beyond them, together with the harness that produced the experimental results reported in the article (see PROTOCOL.md and RESULTS.md). The Open Food Facts data used in the experiments are not redistributed; DATA.md and data/PROVENANCE.txt describe how they were obtained.</p>",
+  "description": "<p>HetFrames is a typed layer over SparkSQL DataFrames. It encodes the schema and the logical model of data in types, and infers how both evolve along a pipeline, so that a compiler rejects transformations and compositions that would otherwise fail at run time.</p><p>It is a proof of concept whose kernel implements the rules of the article and nothing beyond them, together with the harness that produced the experimental results reported in the article (see PROTOCOL.md and RESULTS.md). The Open Food Facts data used in the experiments are not redistributed; DATA.md and data/PROVENANCE.txt describe how they were obtained.</p>",
   "creators": [
     {
       "name": "Guyot, Alexis",

@@ -1,8 +1,8 @@
-package polyframes.variants
+package hetframes.variants
 
 import org.apache.spark.sql.{Encoders, SparkSession}
-import polyframes.bench.P1Dataset._
-import polyframes.bench.Sink
+import hetframes.bench.P1Dataset._
+import hetframes.bench.Sink
 
 /**
  * Datasets, data in a model the operator does not accept.

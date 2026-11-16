@@ -2,7 +2,7 @@
 """Builds VARIANTS.md, a review sheet for the 24 erroneous programs.
 
 For each pipeline and each family of errors, the sheet shows the body of
-the three versions (PolyFrames, DataFrame, Dataset) next to each other,
+the three versions (HetFrames, DataFrame, Dataset) next to each other,
 together with the outcome expected by the harness and the outcome recorded
 in results.csv. It reads the sources and changes none of them.
 
@@ -20,12 +20,12 @@ FAMILIES = [
     ("badmodel", "data in the wrong model"),
     ("badtransfo", "transformation breaking the announced model"),
 ]
-BASELINES = [("pf", "PolyFrames"), ("df", "DataFrame"), ("ds", "Dataset")]
+BASELINES = [("hf", "HetFrames"), ("df", "DataFrame"), ("ds", "Dataset")]
 
 
 def expected():
     """Reads the expected outcome of each variant off Variants.scala."""
-    src = (ROOT / "bench/src/main/scala/polyframes/bench/Variants.scala").read_text("utf-8")
+    src = (ROOT / "bench/src/main/scala/hetframes/bench/Variants.scala").read_text("utf-8")
     pattern = r'Variant\("([\w-]+)",\s*"\w+",\s*"\w+",\s*variant\("[\w.-]+"\),\s*(true|false)'
     return {name: flag == "true" for name, flag in re.findall(pattern, src)}
 
@@ -37,8 +37,8 @@ def recorded():
         for row in csv.DictReader(f):
             if row["experiment"] == "error-prevention" and row["metric"] in ("compiles", "runs"):
                 note = " ".join(row["note"].split())
-                if "PolyFrames:" in note:  # the custom message, not the raw implicit
-                    note = note[note.index("PolyFrames:"):].rstrip(")")
+                if "HetFrames:" in note:  # the custom message, not the raw implicit
+                    note = note[note.index("HetFrames:"):].rstrip(")")
                 if len(note) > 200:
                     note = note[:200] + "…"
                 out.setdefault(row["subject"], {})[row["metric"]] = (row["value"], note)

@@ -2,10 +2,10 @@ cff-version: 1.2.0
 message: "If you use this software, please cite it using the metadata below."
 type: software
 title: >-
-  PolyFrames: companion code for "Leveraging Types to Improve the
+  HetFrames: companion code for "Leveraging Types to Improve the
   Robustness of Analytical Pipelines in Schema-on-Read Systems"
 abstract: >-
-  PolyFrames is a typed layer over SparkSQL DataFrames. It encodes the
+  HetFrames is a typed layer over SparkSQL DataFrames. It encodes the
   schema and the logical model of data in types, and infers how both evolve
   along a pipeline, so that a compiler rejects transformations and
   compositions that would otherwise fail at run time. It is a proof of
@@ -18,7 +18,7 @@ authors:
     orcid: "https://orcid.org/0000-0001-5896-7693"
     affiliation: "Aix Marseille Univ, CNRS, LIS, Marseille, France"
     email: alexis.guyot@lis-lab.fr
-repository-code: "https://github.com/AlexisGuyot/polyframes"
+repository-code: "https://github.com/AlexisGuyot/hetframes"
 license: GPL-3.0-only
 version: 0.1.0
 keywords:

@@ -1,8 +1,8 @@
-package polyframes.variants
+package hetframes.variants
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import polyframes.bench.{P1DataFrame, Sink}
+import hetframes.bench.{P1DataFrame, Sink}
 
 /**
  * DataFrames, data in a model the operator does not accept.

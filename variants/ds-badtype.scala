@@ -1,13 +1,13 @@
-package polyframes.variants
+package hetframes.variants
 
 import org.apache.spark.sql.{Encoders, SparkSession}
-import polyframes.bench.P1Dataset._
-import polyframes.bench.Sink
+import hetframes.bench.P1Dataset._
+import hetframes.bench.Sink
 
 /**
  * Datasets, an attribute of an unexpected domain.
  *
- * Same injection as pf-badtype and df-badtype: carb_share is created as a
+ * Same injection as hf-badtype and df-badtype: carb_share is created as a
  * string at step 1 and read as a number at step 4. With Datasets, the
  * classes describing the intermediate schemas have to be rewritten to
  * carry the mistaken domain, which the compiler then checks.

@@ -1,13 +1,13 @@
-package polyframes.variants
+package hetframes.variants
 
 import org.apache.spark.sql.SparkSession
 import org.apache.spark.sql.functions._
-import polyframes.bench.{P1DataFrame, P2DataFrame, Sink}
+import hetframes.bench.{P1DataFrame, P2DataFrame, Sink}
 
 /**
  * DataFrames, an attribute of an unexpected domain.
  *
- * Same injection as pf2-badtype and ds2-badtype: grade_rank is updated to
+ * Same injection as hf2-badtype and ds2-badtype: grade_rank is updated to
  * a string at step 4 and read as a number at step 6.
  *
  * Expected: compiles; fails at run time, when rows are written.

@@ -1,13 +1,13 @@
 # Results
 
-Produced by `sbt experiments`, then `sbt "bench/runMain polyframes.bench.Report"`.
+Produced by `sbt experiments`, then `sbt "bench/runMain hetframes.bench.Report"`.
 Every figure below is a row of `results.csv` and nothing else.
 The machine, the pinned versions and the extracted data are described in
 `README.md` and `data/PROVENANCE.txt`.
 
 ## Where each error is caught, P1
 
-| error | polyframes | dataframe | dataset |
+| error | hetframes | dataframe | dataset |
 |---|---|---|---|
 | an attribute absent from the schema | compile time | run time | compile time |
 | an attribute of an unexpected domain | compile time | run time | compile time |
@@ -16,7 +16,7 @@ The machine, the pinned versions and the extracted data are described in
 
 ## Where each error is caught, P2
 
-| error | polyframes | dataframe | dataset |
+| error | hetframes | dataframe | dataset |
 |---|---|---|---|
 | an attribute absent from the schema | compile time | run time | compile time |
 | an attribute of an unexpected domain | compile time | run time | compile time |

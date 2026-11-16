@@ -1,14 +1,14 @@
-package polyframes.variants
+package hetframes.variants
 
 import org.apache.spark.sql.{Encoders, SparkSession}
-import polyframes.bench.P1Dataset.{Nutriments, Product}
-import polyframes.bench.P2Dataset._
-import polyframes.bench.Sink
+import hetframes.bench.P1Dataset.{Nutriments, Product}
+import hetframes.bench.P2Dataset._
+import hetframes.bench.Sink
 
 /**
  * Datasets, an attribute of an unexpected domain.
  *
- * Same injection as pf2-badtype and df2-badtype: grade_rank is updated to
+ * Same injection as hf2-badtype and df2-badtype: grade_rank is updated to
  * a string at step 4 and read as a number at step 6.
  *
  * Expected: rejected at compile time, at step 6.
