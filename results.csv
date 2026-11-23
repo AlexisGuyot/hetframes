@@ -1,69 +1,69 @@
 experiment,subject,baseline,family,volume,width,metric,value,note
-width,width-5,hetframes,none,,5,compile-ms,137,median of 5 interleaved rounds
-width,width-10,hetframes,none,,10,compile-ms,194,median of 5 interleaved rounds
-width,width-20,hetframes,none,,20,compile-ms,415,median of 5 interleaved rounds
-width,width-40,hetframes,none,,40,compile-ms,1614,median of 5 interleaved rounds
-width,width-80,hetframes,none,,80,compile-ms,11158,median of 5 interleaved rounds
+width,width-5,hetframes,none,,5,compile-ms,149,median of 5 interleaved rounds
+width,width-10,hetframes,none,,10,compile-ms,203,median of 5 interleaved rounds
+width,width-20,hetframes,none,,20,compile-ms,481,median of 5 interleaved rounds
+width,width-40,hetframes,none,,40,compile-ms,1699,median of 5 interleaved rounds
+width,width-80,hetframes,none,,80,compile-ms,11131,median of 5 interleaved rounds
 error-prevention,p1,hetframes,none,,,compiles,true,
-error-prevention,p1,hetframes,none,,,compile-ms,326,median of 5 interleaved rounds
+error-prevention,p1,hetframes,none,,,compile-ms,342,median of 5 interleaved rounds
 error-prevention,p1-dataframe,dataframe,none,,,compiles,true,
-error-prevention,p1-dataframe,dataframe,none,,,compile-ms,89,median of 5 interleaved rounds
+error-prevention,p1-dataframe,dataframe,none,,,compile-ms,104,median of 5 interleaved rounds
 error-prevention,p1-dataset,dataset,none,,,compiles,true,
-error-prevention,p1-dataset,dataset,none,,,compile-ms,227,median of 5 interleaved rounds
+error-prevention,p1-dataset,dataset,none,,,compile-ms,252,median of 5 interleaved rounds
 error-prevention,hf-noattr,hetframes,noattr,,,compiles,false,"could not find implicit value for parameter reduce: hetframes.infer.Project.Aux[shapeless.labelled.FieldType[String(""code""),String] :: shapeless.labelled.FieldType[String(""product_type""),String] :: shapeless.labelled.FieldType[String(""nutriscore_grade""),String] :: shapeless.labelled.FieldType[String(""pnns_groups_1""),String] :: shapeless.labelled.FieldType[String(""completeness""),Double] :: shapeless.labelled.FieldType[String(""countries_tags""),List[String]] :: shapeless.labelled.FieldType[""nutriments"",shapeless.labelled.FieldType[String(""energy-kcal_100g""),Double] :: shapeless.labelled.FieldType[String(""fat_100g""),Double] :: shapeless.labelled.FieldType[String(""carbohydrates_100g""),Double] :: shapeless.labelled.FieldType[String(""proteins""),Double] :: shapeless.labelled.FieldType[String(""salt""),Double] :: shapeless.labelled.FieldType[""carb_share"",Double] :: shapeless.HNil] :: shapeless.labelled.FieldType[""is_beverage"",Boolean] :: shapeless.HNil,(""cod"" :: shapeless.HNil) :: (""nutriscore_grade"" :: shapeless.HNil) :: shapeless.HNil,NS] (HetFrames: the paths (""cod"" :: shapeless.HNil) :: (""nutriscore_grade"" :: shapeless.HNil) :: shapeless.HNil cannot be projected from the schema"
-error-prevention,hf-noattr,hetframes,noattr,,,compile-ms,236,median of 5 interleaved rounds
+error-prevention,hf-noattr,hetframes,noattr,,,compile-ms,241,median of 5 interleaved rounds
 error-prevention,hf-badtype,hetframes,badtype,,,compiles,false,type mismatch;
-error-prevention,hf-badtype,hetframes,badtype,,,compile-ms,291,median of 5 interleaved rounds
+error-prevention,hf-badtype,hetframes,badtype,,,compile-ms,263,median of 5 interleaved rounds
 error-prevention,hf-badmodel,hetframes,badmodel,,,compiles,false,type mismatch;
-error-prevention,hf-badmodel,hetframes,badmodel,,,compile-ms,275,median of 5 interleaved rounds
+error-prevention,hf-badmodel,hetframes,badmodel,,,compile-ms,280,median of 5 interleaved rounds
 error-prevention,hf-badtransfo,hetframes,badtransfo,,,compiles,false,HetFrames: the schema
-error-prevention,hf-badtransfo,hetframes,badtransfo,,,compile-ms,271,median of 5 interleaved rounds
+error-prevention,hf-badtransfo,hetframes,badtransfo,,,compile-ms,265,median of 5 interleaved rounds
 error-prevention,df-noattr,dataframe,noattr,,,compiles,true,
-error-prevention,df-noattr,dataframe,noattr,,,compile-ms,93,median of 5 interleaved rounds
+error-prevention,df-noattr,dataframe,noattr,,,compile-ms,92,median of 5 interleaved rounds
 error-prevention,df-badtype,dataframe,badtype,,,compiles,true,
-error-prevention,df-badtype,dataframe,badtype,,,compile-ms,83,median of 5 interleaved rounds
+error-prevention,df-badtype,dataframe,badtype,,,compile-ms,88,median of 5 interleaved rounds
 error-prevention,df-badmodel,dataframe,badmodel,,,compiles,true,
-error-prevention,df-badmodel,dataframe,badmodel,,,compile-ms,80,median of 5 interleaved rounds
+error-prevention,df-badmodel,dataframe,badmodel,,,compile-ms,89,median of 5 interleaved rounds
 error-prevention,df-badtransfo,dataframe,badtransfo,,,compiles,true,
-error-prevention,df-badtransfo,dataframe,badtransfo,,,compile-ms,75,median of 5 interleaved rounds
+error-prevention,df-badtransfo,dataframe,badtransfo,,,compile-ms,84,median of 5 interleaved rounds
 error-prevention,ds-noattr,dataset,noattr,,,compiles,false,value cod is not a member of hetframes.bench.P1Dataset.ProductBeverage
-error-prevention,ds-noattr,dataset,noattr,,,compile-ms,89,median of 5 interleaved rounds
+error-prevention,ds-noattr,dataset,noattr,,,compile-ms,90,median of 5 interleaved rounds
 error-prevention,ds-badtype,dataset,badtype,,,compiles,false,type mismatch;
-error-prevention,ds-badtype,dataset,badtype,,,compile-ms,107,median of 5 interleaved rounds
+error-prevention,ds-badtype,dataset,badtype,,,compile-ms,113,median of 5 interleaved rounds
 error-prevention,ds-badmodel,dataset,badmodel,,,compiles,true,
-error-prevention,ds-badmodel,dataset,badmodel,,,compile-ms,117,median of 5 interleaved rounds
+error-prevention,ds-badmodel,dataset,badmodel,,,compile-ms,127,median of 5 interleaved rounds
 error-prevention,ds-badtransfo,dataset,badtransfo,,,compiles,true,
-error-prevention,ds-badtransfo,dataset,badtransfo,,,compile-ms,138,median of 5 interleaved rounds
+error-prevention,ds-badtransfo,dataset,badtransfo,,,compile-ms,145,median of 5 interleaved rounds
 error-prevention,p2,hetframes,none,,,compiles,true,
-error-prevention,p2,hetframes,none,,,compile-ms,545,median of 5 interleaved rounds
+error-prevention,p2,hetframes,none,,,compile-ms,571,median of 5 interleaved rounds
 error-prevention,p2-dataframe,dataframe,none,,,compiles,true,
-error-prevention,p2-dataframe,dataframe,none,,,compile-ms,94,median of 5 interleaved rounds
+error-prevention,p2-dataframe,dataframe,none,,,compile-ms,104,median of 5 interleaved rounds
 error-prevention,p2-dataset,dataset,none,,,compiles,true,
-error-prevention,p2-dataset,dataset,none,,,compile-ms,264,median of 5 interleaved rounds
+error-prevention,p2-dataset,dataset,none,,,compile-ms,244,median of 5 interleaved rounds
 error-prevention,hf2-noattr,hetframes,noattr,,,compiles,false,"could not find implicit value for parameter reduce: hetframes.infer.Project.Aux[shapeless.labelled.FieldType[String(""grade_code""),String] :: shapeless.labelled.FieldType[String(""grade_label""),String] :: shapeless.labelled.FieldType[""grade_rank"",Double] :: shapeless.labelled.FieldType[""barcode"",String] :: shapeless.labelled.FieldType[String(""product_type""),String] :: shapeless.labelled.FieldType[String(""nutriscore_grade""),String] :: shapeless.labelled.FieldType[String(""pnns_groups_1""),String] :: shapeless.labelled.FieldType[String(""completeness""),Double] :: shapeless.labelled.FieldType[String(""countries_tags""),List[String]] :: shapeless.labelled.FieldType[""nutriments"",shapeless.labelled.FieldType[String(""energy-kcal_100g""),Double] :: shapeless.labelled.FieldType[String(""fat_100g""),Double] :: shapeless.labelled.FieldType[String(""carbohydrates_100g""),Double] :: shapeless.labelled.FieldType[String(""proteins""),Double] :: shapeless.labelled.FieldType[""carb_share"",Double] :: shapeless.HNil] :: shapeless.labelled.FieldType[""well_rated"",Boolean] :: shapeless.HNil,(""barcode"" :: shapeless.HNil) :: (""grade_labell"" :: shapeless.HNil) :: shapeless.HNil,NS] (HetFrames: the paths (""barcode"" :: shapeless.HNil) :: (""grade_labell"" :: shapeless.HNil) :: shapeless.HNil cannot be projected from the schema"
-error-prevention,hf2-noattr,hetframes,noattr,,,compile-ms,460,median of 5 interleaved rounds
+error-prevention,hf2-noattr,hetframes,noattr,,,compile-ms,445,median of 5 interleaved rounds
 error-prevention,hf2-badtype,hetframes,badtype,,,compiles,false,type mismatch;
-error-prevention,hf2-badtype,hetframes,badtype,,,compile-ms,386,median of 5 interleaved rounds
+error-prevention,hf2-badtype,hetframes,badtype,,,compile-ms,395,median of 5 interleaved rounds
 error-prevention,hf2-badmodel,hetframes,badmodel,,,compiles,false,type mismatch;
-error-prevention,hf2-badmodel,hetframes,badmodel,,,compile-ms,446,median of 5 interleaved rounds
+error-prevention,hf2-badmodel,hetframes,badmodel,,,compile-ms,482,median of 5 interleaved rounds
 error-prevention,hf2-badtransfo,hetframes,badtransfo,,,compiles,false,HetFrames: the schema
-error-prevention,hf2-badtransfo,hetframes,badtransfo,,,compile-ms,394,median of 5 interleaved rounds
+error-prevention,hf2-badtransfo,hetframes,badtransfo,,,compile-ms,407,median of 5 interleaved rounds
 error-prevention,df2-noattr,dataframe,noattr,,,compiles,true,
-error-prevention,df2-noattr,dataframe,noattr,,,compile-ms,78,median of 5 interleaved rounds
+error-prevention,df2-noattr,dataframe,noattr,,,compile-ms,83,median of 5 interleaved rounds
 error-prevention,df2-badtype,dataframe,badtype,,,compiles,true,
-error-prevention,df2-badtype,dataframe,badtype,,,compile-ms,75,median of 5 interleaved rounds
+error-prevention,df2-badtype,dataframe,badtype,,,compile-ms,81,median of 5 interleaved rounds
 error-prevention,df2-badmodel,dataframe,badmodel,,,compiles,true,
-error-prevention,df2-badmodel,dataframe,badmodel,,,compile-ms,74,median of 5 interleaved rounds
+error-prevention,df2-badmodel,dataframe,badmodel,,,compile-ms,84,median of 5 interleaved rounds
 error-prevention,df2-badtransfo,dataframe,badtransfo,,,compiles,true,
-error-prevention,df2-badtransfo,dataframe,badtransfo,,,compile-ms,72,median of 5 interleaved rounds
+error-prevention,df2-badtransfo,dataframe,badtransfo,,,compile-ms,85,median of 5 interleaved rounds
 error-prevention,ds2-noattr,dataset,noattr,,,compiles,false,value grade_labell is not a member of hetframes.bench.P2Dataset.Rated
-error-prevention,ds2-noattr,dataset,noattr,,,compile-ms,96,median of 5 interleaved rounds
+error-prevention,ds2-noattr,dataset,noattr,,,compile-ms,115,median of 5 interleaved rounds
 error-prevention,ds2-badtype,dataset,badtype,,,compiles,false,type mismatch;
-error-prevention,ds2-badtype,dataset,badtype,,,compile-ms,100,median of 5 interleaved rounds
+error-prevention,ds2-badtype,dataset,badtype,,,compile-ms,117,median of 5 interleaved rounds
 error-prevention,ds2-badmodel,dataset,badmodel,,,compiles,true,
-error-prevention,ds2-badmodel,dataset,badmodel,,,compile-ms,138,median of 5 interleaved rounds
+error-prevention,ds2-badmodel,dataset,badmodel,,,compile-ms,158,median of 5 interleaved rounds
 error-prevention,ds2-badtransfo,dataset,badtransfo,,,compiles,true,
-error-prevention,ds2-badtransfo,dataset,badtransfo,,,compile-ms,153,median of 5 interleaved rounds
+error-prevention,ds2-badtransfo,dataset,badtransfo,,,compile-ms,168,median of 5 interleaved rounds
 error-prevention,df-noattr,dataframe,noattr,,,runs,false,"ExtendedAnalysisException: [UNRESOLVED_COLUMN.WITH_SUGGESTION] A column, variable, or function parameter with name `cod` cannot be resolved. Did you mean one of the following? [`code`, `completeness`, `nutriments`, `product_type`, `is_beverage`]. SQLSTATE: 42703;"
 error-prevention,df-badtype,dataframe,badtype,,,runs,false,"SparkNumberFormatException: [CAST_INVALID_INPUT] The value 'high' of the type ""STRING"" cannot be cast to ""DOUBLE"" because it is malformed. Correct the value as per the syntax, or change its target type. Use `try_cast` to tolerate malformed input and return NULL instead. SQLSTATE: 22018"
 error-prevention,df-badmodel,dataframe,badmodel,,,runs,false,"AnalysisException: [UNSUPPORTED_DATA_TYPE_FOR_DATASOURCE] The CSV datasource doesn't support the column `countries_tags` of the type ""ARRAY<STRING>"". SQLSTATE: 0A000"
@@ -76,63 +76,63 @@ error-prevention,df2-badmodel,dataframe,badmodel,,,runs,false,"AnalysisException
 error-prevention,df2-badtransfo,dataframe,badtransfo,,,runs,false,"AnalysisException: [UNSUPPORTED_DATA_TYPE_FOR_DATASOURCE] The CSV datasource doesn't support the column `nutriments` of the type ""STRUCT<carb_share: DOUBLE>"". SQLSTATE: 0A000"
 error-prevention,ds2-badmodel,dataset,badmodel,,,runs,false,"AnalysisException: [UNSUPPORTED_DATA_TYPE_FOR_DATASOURCE] The CSV datasource doesn't support the column `countries_tags` of the type ""ARRAY<STRING>"". SQLSTATE: 0A000"
 error-prevention,ds2-badtransfo,dataset,badtransfo,,,runs,false,"AnalysisException: [UNSUPPORTED_DATA_TYPE_FOR_DATASOURCE] The CSV datasource doesn't support the column `nutriments` of the type ""STRUCT<carb_share: DOUBLE NOT NULL>"". SQLSTATE: 0A000"
-volume,p1,hetframes,none,10000,,run-ms,566,median of 5 interleaved rounds
-volume,p1,hetframes,none,10000,,heap-mb,239,peak sampled every 50 ms
-volume,p1-dataframe,dataframe,none,10000,,run-ms,510,median of 5 interleaved rounds
-volume,p1-dataframe,dataframe,none,10000,,heap-mb,276,peak sampled every 50 ms
-volume,p1-dataset,dataset,none,10000,,run-ms,548,median of 5 interleaved rounds
-volume,p1-dataset,dataset,none,10000,,heap-mb,237,peak sampled every 50 ms
-volume,p2,hetframes,none,10000,,run-ms,650,median of 5 interleaved rounds
-volume,p2,hetframes,none,10000,,heap-mb,298,peak sampled every 50 ms
-volume,p2-dataframe,dataframe,none,10000,,run-ms,625,median of 5 interleaved rounds
-volume,p2-dataframe,dataframe,none,10000,,heap-mb,254,peak sampled every 50 ms
-volume,p2-dataset,dataset,none,10000,,run-ms,668,median of 5 interleaved rounds
-volume,p2-dataset,dataset,none,10000,,heap-mb,296,peak sampled every 50 ms
-volume,p1,hetframes,none,50000,,run-ms,1147,median of 5 interleaved rounds
-volume,p1,hetframes,none,50000,,heap-mb,425,peak sampled every 50 ms
-volume,p1-dataframe,dataframe,none,50000,,run-ms,1071,median of 5 interleaved rounds
-volume,p1-dataframe,dataframe,none,50000,,heap-mb,452,peak sampled every 50 ms
-volume,p1-dataset,dataset,none,50000,,run-ms,1241,median of 5 interleaved rounds
-volume,p1-dataset,dataset,none,50000,,heap-mb,741,peak sampled every 50 ms
-volume,p2,hetframes,none,50000,,run-ms,1278,median of 5 interleaved rounds
-volume,p2,hetframes,none,50000,,heap-mb,484,peak sampled every 50 ms
-volume,p2-dataframe,dataframe,none,50000,,run-ms,1049,median of 5 interleaved rounds
-volume,p2-dataframe,dataframe,none,50000,,heap-mb,456,peak sampled every 50 ms
-volume,p2-dataset,dataset,none,50000,,run-ms,1060,median of 5 interleaved rounds
-volume,p2-dataset,dataset,none,50000,,heap-mb,782,peak sampled every 50 ms
-volume,p1,hetframes,none,100000,,run-ms,2635,median of 5 interleaved rounds
-volume,p1,hetframes,none,100000,,heap-mb,915,peak sampled every 50 ms
-volume,p1-dataframe,dataframe,none,100000,,run-ms,2594,median of 5 interleaved rounds
-volume,p1-dataframe,dataframe,none,100000,,heap-mb,623,peak sampled every 50 ms
-volume,p1-dataset,dataset,none,100000,,run-ms,2623,median of 5 interleaved rounds
-volume,p1-dataset,dataset,none,100000,,heap-mb,1007,peak sampled every 50 ms
-volume,p2,hetframes,none,100000,,run-ms,2787,median of 5 interleaved rounds
-volume,p2,hetframes,none,100000,,heap-mb,697,peak sampled every 50 ms
-volume,p2-dataframe,dataframe,none,100000,,run-ms,2571,median of 5 interleaved rounds
-volume,p2-dataframe,dataframe,none,100000,,heap-mb,699,peak sampled every 50 ms
-volume,p2-dataset,dataset,none,100000,,run-ms,2779,median of 5 interleaved rounds
-volume,p2-dataset,dataset,none,100000,,heap-mb,631,peak sampled every 50 ms
-volume,p1,hetframes,none,250000,,run-ms,6125,median of 5 interleaved rounds
-volume,p1,hetframes,none,250000,,heap-mb,1112,peak sampled every 50 ms
-volume,p1-dataframe,dataframe,none,250000,,run-ms,5955,median of 5 interleaved rounds
-volume,p1-dataframe,dataframe,none,250000,,heap-mb,773,peak sampled every 50 ms
-volume,p1-dataset,dataset,none,250000,,run-ms,6105,median of 5 interleaved rounds
-volume,p1-dataset,dataset,none,250000,,heap-mb,1022,peak sampled every 50 ms
-volume,p2,hetframes,none,250000,,run-ms,6072,median of 5 interleaved rounds
-volume,p2,hetframes,none,250000,,heap-mb,1093,peak sampled every 50 ms
-volume,p2-dataframe,dataframe,none,250000,,run-ms,5783,median of 5 interleaved rounds
-volume,p2-dataframe,dataframe,none,250000,,heap-mb,864,peak sampled every 50 ms
-volume,p2-dataset,dataset,none,250000,,run-ms,6095,median of 5 interleaved rounds
-volume,p2-dataset,dataset,none,250000,,heap-mb,1015,peak sampled every 50 ms
-volume,p1,hetframes,none,500000,,run-ms,14642,median of 5 interleaved rounds
-volume,p1,hetframes,none,500000,,heap-mb,933,peak sampled every 50 ms
-volume,p1-dataframe,dataframe,none,500000,,run-ms,13769,median of 5 interleaved rounds
-volume,p1-dataframe,dataframe,none,500000,,heap-mb,934,peak sampled every 50 ms
-volume,p1-dataset,dataset,none,500000,,run-ms,13583,median of 5 interleaved rounds
-volume,p1-dataset,dataset,none,500000,,heap-mb,963,peak sampled every 50 ms
-volume,p2,hetframes,none,500000,,run-ms,16001,median of 5 interleaved rounds
-volume,p2,hetframes,none,500000,,heap-mb,1061,peak sampled every 50 ms
-volume,p2-dataframe,dataframe,none,500000,,run-ms,16508,median of 5 interleaved rounds
-volume,p2-dataframe,dataframe,none,500000,,heap-mb,1021,peak sampled every 50 ms
-volume,p2-dataset,dataset,none,500000,,run-ms,14473,median of 5 interleaved rounds
-volume,p2-dataset,dataset,none,500000,,heap-mb,1007,peak sampled every 50 ms
+volume,p1,hetframes,none,10000,,run-ms,578,median of 5 interleaved rounds
+volume,p1,hetframes,none,10000,,heap-mb,232,peak sampled every 50 ms
+volume,p1-dataframe,dataframe,none,10000,,run-ms,490,median of 5 interleaved rounds
+volume,p1-dataframe,dataframe,none,10000,,heap-mb,285,peak sampled every 50 ms
+volume,p1-dataset,dataset,none,10000,,run-ms,569,median of 5 interleaved rounds
+volume,p1-dataset,dataset,none,10000,,heap-mb,313,peak sampled every 50 ms
+volume,p2,hetframes,none,10000,,run-ms,688,median of 5 interleaved rounds
+volume,p2,hetframes,none,10000,,heap-mb,292,peak sampled every 50 ms
+volume,p2-dataframe,dataframe,none,10000,,run-ms,621,median of 5 interleaved rounds
+volume,p2-dataframe,dataframe,none,10000,,heap-mb,289,peak sampled every 50 ms
+volume,p2-dataset,dataset,none,10000,,run-ms,704,median of 5 interleaved rounds
+volume,p2-dataset,dataset,none,10000,,heap-mb,309,peak sampled every 50 ms
+volume,p1,hetframes,none,50000,,run-ms,1030,median of 5 interleaved rounds
+volume,p1,hetframes,none,50000,,heap-mb,397,peak sampled every 50 ms
+volume,p1-dataframe,dataframe,none,50000,,run-ms,815,median of 5 interleaved rounds
+volume,p1-dataframe,dataframe,none,50000,,heap-mb,424,peak sampled every 50 ms
+volume,p1-dataset,dataset,none,50000,,run-ms,865,median of 5 interleaved rounds
+volume,p1-dataset,dataset,none,50000,,heap-mb,447,peak sampled every 50 ms
+volume,p2,hetframes,none,50000,,run-ms,967,median of 5 interleaved rounds
+volume,p2,hetframes,none,50000,,heap-mb,653,peak sampled every 50 ms
+volume,p2-dataframe,dataframe,none,50000,,run-ms,815,median of 5 interleaved rounds
+volume,p2-dataframe,dataframe,none,50000,,heap-mb,401,peak sampled every 50 ms
+volume,p2-dataset,dataset,none,50000,,run-ms,1004,median of 5 interleaved rounds
+volume,p2-dataset,dataset,none,50000,,heap-mb,965,peak sampled every 50 ms
+volume,p1,hetframes,none,100000,,run-ms,1862,median of 5 interleaved rounds
+volume,p1,hetframes,none,100000,,heap-mb,1022,peak sampled every 50 ms
+volume,p1-dataframe,dataframe,none,100000,,run-ms,1827,median of 5 interleaved rounds
+volume,p1-dataframe,dataframe,none,100000,,heap-mb,616,peak sampled every 50 ms
+volume,p1-dataset,dataset,none,100000,,run-ms,1913,median of 5 interleaved rounds
+volume,p1-dataset,dataset,none,100000,,heap-mb,646,peak sampled every 50 ms
+volume,p2,hetframes,none,100000,,run-ms,1984,median of 5 interleaved rounds
+volume,p2,hetframes,none,100000,,heap-mb,926,peak sampled every 50 ms
+volume,p2-dataframe,dataframe,none,100000,,run-ms,1779,median of 5 interleaved rounds
+volume,p2-dataframe,dataframe,none,100000,,heap-mb,665,peak sampled every 50 ms
+volume,p2-dataset,dataset,none,100000,,run-ms,2043,median of 5 interleaved rounds
+volume,p2-dataset,dataset,none,100000,,heap-mb,686,peak sampled every 50 ms
+volume,p1,hetframes,none,250000,,run-ms,4210,median of 5 interleaved rounds
+volume,p1,hetframes,none,250000,,heap-mb,1265,peak sampled every 50 ms
+volume,p1-dataframe,dataframe,none,250000,,run-ms,3991,median of 5 interleaved rounds
+volume,p1-dataframe,dataframe,none,250000,,heap-mb,819,peak sampled every 50 ms
+volume,p1-dataset,dataset,none,250000,,run-ms,4038,median of 5 interleaved rounds
+volume,p1-dataset,dataset,none,250000,,heap-mb,1074,peak sampled every 50 ms
+volume,p2,hetframes,none,250000,,run-ms,4192,median of 5 interleaved rounds
+volume,p2,hetframes,none,250000,,heap-mb,1161,peak sampled every 50 ms
+volume,p2-dataframe,dataframe,none,250000,,run-ms,3821,median of 5 interleaved rounds
+volume,p2-dataframe,dataframe,none,250000,,heap-mb,843,peak sampled every 50 ms
+volume,p2-dataset,dataset,none,250000,,run-ms,4143,median of 5 interleaved rounds
+volume,p2-dataset,dataset,none,250000,,heap-mb,1169,peak sampled every 50 ms
+volume,p1,hetframes,none,500000,,run-ms,10509,median of 5 interleaved rounds
+volume,p1,hetframes,none,500000,,heap-mb,1013,peak sampled every 50 ms
+volume,p1-dataframe,dataframe,none,500000,,run-ms,8891,median of 5 interleaved rounds
+volume,p1-dataframe,dataframe,none,500000,,heap-mb,931,peak sampled every 50 ms
+volume,p1-dataset,dataset,none,500000,,run-ms,8848,median of 5 interleaved rounds
+volume,p1-dataset,dataset,none,500000,,heap-mb,960,peak sampled every 50 ms
+volume,p2,hetframes,none,500000,,run-ms,9748,median of 5 interleaved rounds
+volume,p2,hetframes,none,500000,,heap-mb,1174,peak sampled every 50 ms
+volume,p2-dataframe,dataframe,none,500000,,run-ms,11838,median of 5 interleaved rounds
+volume,p2-dataframe,dataframe,none,500000,,heap-mb,1017,peak sampled every 50 ms
+volume,p2-dataset,dataset,none,500000,,run-ms,9601,median of 5 interleaved rounds
+volume,p2-dataset,dataset,none,500000,,heap-mb,1012,peak sampled every 50 ms
